@@ -28,6 +28,7 @@ import DriftTab from "./pages/DriftTab";
 import AuditLogsSettings from "./pages/AuditLogsSettings";
 import Explore from "./pages/Explore";
 import ExplorePromptDetail from "./pages/ExplorePromptDetail";
+import UserProfile from "./pages/UserProfile";
 import ProviderKeysSettings from "./pages/ProviderKeysSettings";
 import WorkspaceSettings from "./pages/WorkspaceSettings";
 import MembersSettings from "./pages/MembersSettings";
