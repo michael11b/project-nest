@@ -24,7 +24,7 @@ import { TrendingSection } from "@/components/TrendingSection";
 import { ExploreCollectionsSection } from "@/components/ExploreCollectionsSection";
 import { SaveToCollectionDialog } from "@/components/SaveToCollectionDialog";
 
-function PromptCard({ prompt, onFork }: { prompt: any; onFork?: (id: string, name: string) => void }) {
+function PromptCard({ prompt, onFork, onSave }: { prompt: any; onFork?: (id: string, name: string) => void; onSave?: (id: string) => void }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [liking, setLiking] = useState(false);
