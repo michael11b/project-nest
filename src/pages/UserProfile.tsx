@@ -112,6 +112,7 @@ export default function UserProfile() {
   const { data: followerCount } = useFollowerCount(userId);
   const { data: followingCount } = useFollowingCount(userId);
   const { data: isFollowing } = useIsFollowing(user?.id, userId);
+  const { data: collections } = useUserCollections(userId);
 
   const followMutation = useMutation({
     mutationFn: async () => {
