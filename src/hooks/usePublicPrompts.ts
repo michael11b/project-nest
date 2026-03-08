@@ -1,14 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export type SortOption = "hot" | "new" | "top" | "most_liked";
+
+const PAGE_SIZE = 24;
 
 interface UsePublicPromptsOptions {
   search?: string;
   category?: string;
   tag?: string;
   sort?: SortOption;
-  limit?: number;
 }
 
 export function usePublicPrompts({
@@ -16,30 +17,30 @@ export function usePublicPrompts({
   category,
   tag,
   sort = "hot",
-  limit = 24,
 }: UsePublicPromptsOptions = {}) {
-  return useQuery({
-    queryKey: ["public-prompts", search, category, tag, sort, limit],
-    queryFn: async () => {
+  return useInfiniteQuery({
+    queryKey: ["public-prompts", search, category, tag, sort],
+    initialPageParam: 0,
+    queryFn: async ({ pageParam = 0 }) => {
+      const from = pageParam * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
       let query = supabase
         .from("prompts")
         .select("*, author_profile:profiles(id,display_name,avatar_url)")
         .eq("visibility", "public")
-        .limit(limit);
+        .range(from, to);
 
-      // Full-text search
       if (search?.trim()) {
         query = query.textSearch("fts_vector", search.trim(), {
           type: "websearch",
         });
       }
 
-      // Tag filter
       if (tag) {
         query = query.contains("tags", [tag]);
       }
 
-      // Sorting
       switch (sort) {
         case "new":
           query = query.order("created_at", { ascending: false });
@@ -52,7 +53,6 @@ export function usePublicPrompts({
           break;
         case "hot":
         default:
-          // Hot = combination of recency and likes
           query = query.order("like_count", { ascending: false }).order("created_at", { ascending: false });
           break;
       }
@@ -60,18 +60,27 @@ export function usePublicPrompts({
       const { data, error } = await query;
       if (error) throw error;
 
-      // If category filter, do a second query to get prompt IDs in that category
-      if (category && data) {
+      let results = data ?? [];
+
+      // Client-side category filter
+      if (category && results.length) {
         const { data: mappings } = await supabase
           .from("prompt_category_mappings")
           .select("prompt_id")
           .eq("category_id", category);
 
         const categoryPromptIds = new Set(mappings?.map((m: any) => m.prompt_id) ?? []);
-        return data.filter((p: any) => categoryPromptIds.has(p.id));
+        results = results.filter((p: any) => categoryPromptIds.has(p.id));
       }
 
-      return data;
+      return results;
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      // If we got a full page, there might be more
+      if (lastPage.length >= PAGE_SIZE) {
+        return allPages.length;
+      }
+      return undefined;
     },
   });
 }
