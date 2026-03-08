@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +27,7 @@ export default function Dashboard() {
     queryFn: async () => {
       const { data } = await supabase
         .from("eval_runs")
-        .select("id, status, score, model, created_at")
+        .select("id, status, score, model, created_at, prompt_version_id, prompt_versions(prompt_id)")
         .eq("workspace_id", workspace.id)
         .order("created_at", { ascending: false })
         .limit(5);
@@ -85,11 +86,16 @@ export default function Dashboard() {
             {recentPrompts?.length ? (
               <ul className="space-y-2">
                 {recentPrompts.map((p) => (
-                  <li key={p.id} className="flex items-center justify-between text-sm">
-                    <span className="truncate font-medium">{p.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(p.updated_at).toLocaleDateString()}
-                    </span>
+                  <li key={p.id}>
+                    <Link
+                      to={`/w/${workspace.slug}/prompts/${p.id}`}
+                      className="flex items-center justify-between text-sm rounded-md px-2 py-1.5 -mx-2 hover:bg-accent transition-colors"
+                    >
+                      <span className="truncate font-medium">{p.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(p.updated_at).toLocaleDateString()}
+                      </span>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -108,17 +114,34 @@ export default function Dashboard() {
           <CardContent>
             {recentRuns?.length ? (
               <ul className="space-y-2">
-                {recentRuns.map((r) => (
-                  <li key={r.id} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={statusColor(r.status) as any}>{r.status}</Badge>
-                      <span className="text-xs text-muted-foreground">{r.model}</span>
+                {recentRuns.map((r) => {
+                  const promptId = (r as any).prompt_versions?.prompt_id;
+                  const inner = (
+                    <div className="flex items-center justify-between text-sm w-full">
+                      <div className="flex items-center gap-2">
+                        <Badge variant={statusColor(r.status) as any}>{r.status}</Badge>
+                        <span className="text-xs text-muted-foreground">{r.model}</span>
+                      </div>
+                      {r.score !== null && (
+                        <span className="text-xs font-mono">{(Number(r.score) * 100).toFixed(0)}%</span>
+                      )}
                     </div>
-                    {r.score !== null && (
-                      <span className="text-xs font-mono">{(Number(r.score) * 100).toFixed(0)}%</span>
-                    )}
-                  </li>
-                ))}
+                  );
+                  return (
+                    <li key={r.id}>
+                      {promptId ? (
+                        <Link
+                          to={`/w/${workspace.slug}/prompts/${promptId}/evals/${r.id}`}
+                          className="flex rounded-md px-2 py-1.5 -mx-2 hover:bg-accent transition-colors"
+                        >
+                          {inner}
+                        </Link>
+                      ) : (
+                        <div className="flex px-2 py-1.5 -mx-2">{inner}</div>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             ) : (
               <p className="text-sm text-muted-foreground">No eval runs yet</p>
