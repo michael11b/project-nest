@@ -12,10 +12,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  ArrowLeft, Heart, MessageCircle, Eye, Calendar, User, Send, Sparkles, LogIn,
+  ArrowLeft, Heart, MessageCircle, Eye, Calendar, User, Send, Sparkles, LogIn, GitFork,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { ForkPromptDialog } from "@/components/ForkPromptDialog";
 
 export default function ExplorePromptDetail() {
   const { promptId } = useParams<{ promptId: string }>();
