@@ -207,6 +207,15 @@ serve(async (req) => {
       .eq("id", eval_run_id)
       .single();
     if (runErr || !run) throw new Error("Eval run not found");
+
+    // If authenticated via API key, verify the run belongs to the same workspace
+    if (callerWorkspaceId && run.workspace_id !== callerWorkspaceId) {
+      return new Response(JSON.stringify({ error: "Forbidden: API key does not have access to this workspace" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (run.status !== "queued") {
       return new Response(JSON.stringify({ message: "Run already processed" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
