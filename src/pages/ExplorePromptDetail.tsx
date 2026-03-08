@@ -264,6 +264,15 @@ export default function ExplorePromptDetail() {
           </div>
         </div>
       </div>
+
+      {prompt && (
+        <ForkPromptDialog
+          open={forkOpen}
+          onOpenChange={setForkOpen}
+          promptId={prompt.id}
+          promptName={prompt.name}
+        />
+      )}
     </div>
   );
 }
