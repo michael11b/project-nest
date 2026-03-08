@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useCollectionDetail, useRemoveFromCollection, useReorderCollectionItems } from "@/hooks/useCollections";
+import { useCollectionDetail, useRemoveFromCollection, useReorderCollectionItems, useUpdateCollection } from "@/hooks/useCollections";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Heart, Eye, Sparkles, Trash2, Globe, Lock, GripVertical } from "lucide-react";
 import CollectionCoverUpload from "@/components/CollectionCoverUpload";
+import CollectionInlineEdit from "@/components/CollectionInlineEdit";
 import {
   DndContext,
   closestCenter,
@@ -180,19 +181,13 @@ export default function CollectionDetail() {
 
       <div className="max-w-5xl mx-auto px-4 py-10">
         <div className="mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-3xl font-bold text-foreground">{collection.title}</h1>
-            <Badge variant="secondary" className="text-xs">
-              {collection.visibility === "public" ? (
-                <><Globe className="h-3 w-3 mr-1" /> Public</>
-              ) : (
-                <><Lock className="h-3 w-3 mr-1" /> Private</>
-              )}
-            </Badge>
-          </div>
-          {collection.description && (
-            <p className="text-muted-foreground mb-4">{collection.description}</p>
-          )}
+          <CollectionInlineEdit
+            collectionId={collection.id}
+            title={collection.title}
+            description={collection.description}
+            visibility={collection.visibility}
+            isOwner={isOwner}
+          />
           {owner && (
             <Link to={`/u/${owner.user_id}`} className="inline-flex items-center gap-2 hover:opacity-80">
               <Avatar className="h-6 w-6">
