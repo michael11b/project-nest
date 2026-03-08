@@ -17,8 +17,10 @@ import {
   Globe,
   ArrowLeft,
   GitFork,
+  FolderOpen,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useUserCollections } from "@/hooks/useCollections";
 
 function useUserProfile(userId: string | undefined) {
   return useQuery({
@@ -110,6 +112,7 @@ export default function UserProfile() {
   const { data: followerCount } = useFollowerCount(userId);
   const { data: followingCount } = useFollowingCount(userId);
   const { data: isFollowing } = useIsFollowing(user?.id, userId);
+  const { data: collections } = useUserCollections(userId);
 
   const followMutation = useMutation({
     mutationFn: async () => {
@@ -293,6 +296,31 @@ export default function UserProfile() {
               </Link>
             ))}
           </div>
+        )}
+
+        {/* Public collections */}
+        {collections && collections.filter((c: any) => c.visibility === "public").length > 0 && (
+          <>
+            <h2 className="text-lg font-semibold text-foreground mb-4 mt-10 flex items-center gap-2">
+              <FolderOpen className="h-5 w-5" /> Collections
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {collections
+                .filter((c: any) => c.visibility === "public")
+                .map((c: any) => (
+                  <Link key={c.id} to={`/collections/${c.id}`}>
+                    <Card className="hover:shadow-md transition-shadow h-full">
+                      <CardContent className="p-5">
+                        <h3 className="font-semibold text-foreground truncate mb-1">{c.title}</h3>
+                        {c.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-2">{c.description}</p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+            </div>
+          </>
         )}
       </div>
     </div>

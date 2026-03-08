@@ -15,14 +15,16 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Search, Heart, MessageCircle, Eye, TrendingUp, Clock, Star, Flame, Sparkles, LogIn, GitFork,
+  Search, Heart, MessageCircle, Eye, TrendingUp, Clock, Star, Flame, Sparkles, LogIn, GitFork, FolderPlus,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { FeaturedCarousel } from "@/components/FeaturedCarousel";
 import { TrendingSection } from "@/components/TrendingSection";
+import { ExploreCollectionsSection } from "@/components/ExploreCollectionsSection";
+import { SaveToCollectionDialog } from "@/components/SaveToCollectionDialog";
 
-function PromptCard({ prompt, onFork }: { prompt: any; onFork?: (id: string, name: string) => void }) {
+function PromptCard({ prompt, onFork, onSave }: { prompt: any; onFork?: (id: string, name: string) => void; onSave?: (id: string) => void }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [liking, setLiking] = useState(false);
@@ -118,6 +120,15 @@ function PromptCard({ prompt, onFork }: { prompt: any; onFork?: (id: string, nam
               </span>
             </div>
             <div className="flex items-center gap-2">
+              {user && onSave && (
+                <button
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSave(prompt.id); }}
+                  className="flex items-center gap-1 hover:text-primary transition-colors"
+                  title="Save to collection"
+                >
+                  <FolderPlus className="h-3.5 w-3.5" />
+                </button>
+              )}
               {user && onFork && (
                 <button
                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); onFork(prompt.id, prompt.name); }}
@@ -155,6 +166,7 @@ export default function Explore() {
   const sort = (searchParams.get("sort") as SortOption) ?? "hot";
   const [searchInput, setSearchInput] = useState(search);
   const [forkTarget, setForkTarget] = useState<{ id: string; name: string } | null>(null);
+  const [savePromptId, setSavePromptId] = useState<string | null>(null);
 
   const { data: categories, isLoading: catsLoading } = useCategories();
   const {
@@ -283,6 +295,9 @@ export default function Explore() {
       {/* Trending this week */}
       <TrendingSection />
 
+      {/* Collections */}
+      <ExploreCollectionsSection />
+
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Filters bar */}
@@ -349,6 +364,7 @@ export default function Explore() {
                   key={p.id}
                   prompt={p}
                   onFork={(id, name) => setForkTarget({ id, name })}
+                  onSave={(id) => setSavePromptId(id)}
                 />
               ))}
             </div>
@@ -374,6 +390,14 @@ export default function Explore() {
           onOpenChange={(open) => { if (!open) setForkTarget(null); }}
           promptId={forkTarget.id}
           promptName={forkTarget.name}
+        />
+      )}
+
+      {savePromptId && (
+        <SaveToCollectionDialog
+          open={!!savePromptId}
+          onOpenChange={(open) => { if (!open) setSavePromptId(null); }}
+          promptId={savePromptId}
         />
       )}
     </div>

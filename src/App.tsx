@@ -27,6 +27,8 @@ import EvalRunDetail from "./pages/EvalRunDetail";
 import DriftTab from "./pages/DriftTab";
 import AuditLogsSettings from "./pages/AuditLogsSettings";
 import Explore from "./pages/Explore";
+import CollectionsList from "./pages/CollectionsList";
+import CollectionDetail from "./pages/CollectionDetail";
 import ExplorePromptDetail from "./pages/ExplorePromptDetail";
 import UserProfile from "./pages/UserProfile";
 import ProviderKeysSettings from "./pages/ProviderKeysSettings";
@@ -48,6 +50,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/explore/:promptId" element={<ExplorePromptDetail />} />
+            <Route path="/collections" element={<CollectionsList />} />
+            <Route path="/collections/:collectionId" element={<CollectionDetail />} />
             <Route path="/u/:userId" element={<UserProfile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
