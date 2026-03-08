@@ -1,1 +1,7 @@
 project_id = "rbisxguihrzaubghkvqv"
+
+[functions.run-eval]
+verify_jwt = false
+
+[functions.drift-monitor]
+verify_jwt = false
