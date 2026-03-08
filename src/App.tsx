@@ -26,6 +26,8 @@ import EvalsTab from "./pages/EvalsTab";
 import EvalRunDetail from "./pages/EvalRunDetail";
 import DriftTab from "./pages/DriftTab";
 import AuditLogsSettings from "./pages/AuditLogsSettings";
+import Explore from "./pages/Explore";
+import ExplorePromptDetail from "./pages/ExplorePromptDetail";
 import ProviderKeysSettings from "./pages/ProviderKeysSettings";
 import WorkspaceSettings from "./pages/WorkspaceSettings";
 import MembersSettings from "./pages/MembersSettings";
