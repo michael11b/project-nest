@@ -392,6 +392,14 @@ export default function Explore() {
           promptName={forkTarget.name}
         />
       )}
+
+      {savePromptId && (
+        <SaveToCollectionDialog
+          open={!!savePromptId}
+          onOpenChange={(open) => { if (!open) setSavePromptId(null); }}
+          promptId={savePromptId}
+        />
+      )}
     </div>
   );
 }
