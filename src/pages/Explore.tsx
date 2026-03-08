@@ -155,13 +155,37 @@ export default function Explore() {
   const [searchInput, setSearchInput] = useState(search);
   const [forkTarget, setForkTarget] = useState<{ id: string; name: string } | null>(null);
 
-  const { data: categories, isLoading: catsLoading } = useCategories();
-  const { data: prompts, isLoading } = usePublicPrompts({
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePublicPrompts({
     search: search || undefined,
     category: category || undefined,
     tag: tag || undefined,
     sort,
   });
+
+  const prompts = useMemo(() => data?.pages.flat() ?? [], [data]);
+
+  // Intersection observer for infinite scroll
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = loadMoreRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const updateParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
