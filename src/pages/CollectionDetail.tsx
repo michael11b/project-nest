@@ -108,10 +108,12 @@ function SortablePromptCard({
 
 export default function CollectionDetail() {
   const { collectionId } = useParams<{ collectionId: string }>();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { data: collection, isLoading } = useCollectionDetail(collectionId);
   const removeItem = useRemoveFromCollection();
   const reorderItems = useReorderCollectionItems();
+  const deleteCollection = useDeleteCollection();
   const [localItems, setLocalItems] = useState<any[] | null>(null);
 
   const sensors = useSensors(
