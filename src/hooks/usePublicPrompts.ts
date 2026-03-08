@@ -23,7 +23,7 @@ export function usePublicPrompts({
     queryFn: async () => {
       let query = supabase
         .from("prompts")
-        .select("*")
+        .select("*, author_profile:profiles(id,display_name,avatar_url)")
         .eq("visibility", "public")
         .limit(limit);
 
