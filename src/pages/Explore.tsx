@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { ForkPromptDialog } from "@/components/ForkPromptDialog";
 import { Link, useSearchParams } from "react-router-dom";
 import { usePublicPrompts, useCategories, type SortOption } from "@/hooks/usePublicPrompts";
@@ -156,12 +156,37 @@ export default function Explore() {
   const [forkTarget, setForkTarget] = useState<{ id: string; name: string } | null>(null);
 
   const { data: categories, isLoading: catsLoading } = useCategories();
-  const { data: prompts, isLoading } = usePublicPrompts({
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePublicPrompts({
     search: search || undefined,
     category: category || undefined,
     tag: tag || undefined,
     sort,
   });
+
+  const prompts = useMemo(() => data?.pages.flat() ?? [], [data]);
+
+  // Intersection observer for infinite scroll
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = loadMoreRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const updateParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
@@ -304,7 +329,7 @@ export default function Explore() {
               </div>
             ))}
           </div>
-        ) : !prompts?.length ? (
+        ) : !prompts.length ? (
           <div className="text-center py-20 space-y-3">
             <Sparkles className="h-12 w-12 text-muted-foreground/30 mx-auto" />
             <p className="text-muted-foreground">No public prompts found.</p>
@@ -313,15 +338,29 @@ export default function Explore() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {prompts.map((p: any) => (
-              <PromptCard
-                key={p.id}
-                prompt={p}
-                onFork={(id, name) => setForkTarget({ id, name })}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {prompts.map((p: any) => (
+                <PromptCard
+                  key={p.id}
+                  prompt={p}
+                  onFork={(id, name) => setForkTarget({ id, name })}
+                />
+              ))}
+            </div>
+            {/* Infinite scroll sentinel */}
+            <div ref={loadMoreRef} className="flex justify-center py-8">
+              {isFetchingNextPage && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  Loading more…
+                </div>
+              )}
+              {!hasNextPage && prompts.length > 0 && (
+                <p className="text-xs text-muted-foreground">You've seen all prompts</p>
+              )}
+            </div>
+          </>
         )}
       </div>
 
