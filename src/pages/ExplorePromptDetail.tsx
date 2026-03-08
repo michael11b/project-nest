@@ -12,10 +12,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  ArrowLeft, Heart, MessageCircle, Eye, Calendar, User, Send, Sparkles, LogIn,
+  ArrowLeft, Heart, MessageCircle, Eye, Calendar, User, Send, Sparkles, LogIn, GitFork,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { ForkPromptDialog } from "@/components/ForkPromptDialog";
 
 export default function ExplorePromptDetail() {
   const { promptId } = useParams<{ promptId: string }>();
@@ -23,6 +24,7 @@ export default function ExplorePromptDetail() {
   const queryClient = useQueryClient();
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [forkOpen, setForkOpen] = useState(false);
 
   const { data: prompt, isLoading } = useQuery({
     queryKey: ["public-prompt", promptId],
@@ -137,7 +139,11 @@ export default function ExplorePromptDetail() {
               <p className="text-muted-foreground text-sm mt-1">{prompt.description}</p>
             )}
           </div>
-          {!user && (
+          {user ? (
+            <Button size="sm" variant="outline" onClick={() => setForkOpen(true)}>
+              <GitFork className="h-4 w-4 mr-2" /> Fork
+            </Button>
+          ) : (
             <Link to="/login">
               <Button size="sm"><LogIn className="h-4 w-4 mr-2" /> Sign In</Button>
             </Link>
@@ -258,6 +264,15 @@ export default function ExplorePromptDetail() {
           </div>
         </div>
       </div>
+
+      {prompt && (
+        <ForkPromptDialog
+          open={forkOpen}
+          onOpenChange={setForkOpen}
+          promptId={prompt.id}
+          promptName={prompt.name}
+        />
+      )}
     </div>
   );
 }

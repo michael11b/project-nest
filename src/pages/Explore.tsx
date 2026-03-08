@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { ForkPromptDialog } from "@/components/ForkPromptDialog";
 import { Link, useSearchParams } from "react-router-dom";
 import { usePublicPrompts, useCategories, type SortOption } from "@/hooks/usePublicPrompts";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,12 +14,12 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Search, Heart, MessageCircle, Eye, TrendingUp, Clock, Star, Flame, Sparkles, LogIn,
+  Search, Heart, MessageCircle, Eye, TrendingUp, Clock, Star, Flame, Sparkles, LogIn, GitFork,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
-function PromptCard({ prompt }: { prompt: any }) {
+function PromptCard({ prompt, onFork }: { prompt: any; onFork?: (id: string, name: string) => void }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [liking, setLiking] = useState(false);
@@ -104,10 +105,21 @@ function PromptCard({ prompt }: { prompt: any }) {
                 {prompt.comment_count || 0}
               </span>
             </div>
-            <span className="flex items-center gap-1">
-              <Eye className="h-3.5 w-3.5" />
-              {prompt.view_count || 0}
-            </span>
+            <div className="flex items-center gap-2">
+              {user && onFork && (
+                <button
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); onFork(prompt.id, prompt.name); }}
+                  className="flex items-center gap-1 hover:text-primary transition-colors"
+                  title="Fork to your workspace"
+                >
+                  <GitFork className="h-3.5 w-3.5" />
+                </button>
+              )}
+              <span className="flex items-center gap-1">
+                <Eye className="h-3.5 w-3.5" />
+                {prompt.view_count || 0}
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -130,6 +142,7 @@ export default function Explore() {
   const tag = searchParams.get("tag") ?? "";
   const sort = (searchParams.get("sort") as SortOption) ?? "hot";
   const [searchInput, setSearchInput] = useState(search);
+  const [forkTarget, setForkTarget] = useState<{ id: string; name: string } | null>(null);
 
   const { data: categories, isLoading: catsLoading } = useCategories();
   const { data: prompts, isLoading } = usePublicPrompts({
@@ -288,11 +301,24 @@ export default function Explore() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {prompts.map((p: any) => (
-              <PromptCard key={p.id} prompt={p} />
+              <PromptCard
+                key={p.id}
+                prompt={p}
+                onFork={(id, name) => setForkTarget({ id, name })}
+              />
             ))}
           </div>
         )}
       </div>
+
+      {forkTarget && (
+        <ForkPromptDialog
+          open={!!forkTarget}
+          onOpenChange={(open) => { if (!open) setForkTarget(null); }}
+          promptId={forkTarget.id}
+          promptName={forkTarget.name}
+        />
+      )}
     </div>
   );
 }
