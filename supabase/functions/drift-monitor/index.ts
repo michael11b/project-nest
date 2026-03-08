@@ -165,11 +165,15 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Fetch all enabled drift policies
-    const { data: policies, error: polErr } = await supabase
+    // Fetch enabled drift policies (scoped to workspace if using API key)
+    let policiesQuery = supabase
       .from("drift_policies")
       .select("*")
       .eq("enabled", true);
+    if (callerWorkspaceId) {
+      policiesQuery = policiesQuery.eq("workspace_id", callerWorkspaceId);
+    }
+    const { data: policies, error: polErr } = await policiesQuery;
 
     if (polErr) throw new Error(`Failed to fetch policies: ${polErr.message}`);
     if (!policies?.length) {
