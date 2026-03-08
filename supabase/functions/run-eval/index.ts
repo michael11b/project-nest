@@ -259,7 +259,6 @@ serve(async (req) => {
           body: JSON.stringify({
             model: gatewayModel,
             messages,
-            temperature,
             max_completion_tokens: maxTokens,
             stream: false,
           }),
