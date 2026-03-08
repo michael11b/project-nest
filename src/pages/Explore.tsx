@@ -364,6 +364,7 @@ export default function Explore() {
                   key={p.id}
                   prompt={p}
                   onFork={(id, name) => setForkTarget({ id, name })}
+                  onSave={(id) => setSavePromptId(id)}
                 />
               ))}
             </div>
