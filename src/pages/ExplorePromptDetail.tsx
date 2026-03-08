@@ -153,7 +153,7 @@ export default function ExplorePromptDetail() {
           <button
             onClick={toggleLike}
             disabled={liking}
-            className={`flex items-center gap-1 transition-colors ${myLike ? "text-red-500" : "hover:text-red-500"}`}
+            className={`flex items-center gap-1 transition-colors ${myLike ? "text-destructive" : "hover:text-destructive"}`}
           >
             <Heart className={`h-3.5 w-3.5 ${myLike ? "fill-current" : ""}`} />
             {prompt.like_count || 0} likes
