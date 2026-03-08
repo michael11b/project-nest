@@ -181,19 +181,13 @@ export default function CollectionDetail() {
 
       <div className="max-w-5xl mx-auto px-4 py-10">
         <div className="mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-3xl font-bold text-foreground">{collection.title}</h1>
-            <Badge variant="secondary" className="text-xs">
-              {collection.visibility === "public" ? (
-                <><Globe className="h-3 w-3 mr-1" /> Public</>
-              ) : (
-                <><Lock className="h-3 w-3 mr-1" /> Private</>
-              )}
-            </Badge>
-          </div>
-          {collection.description && (
-            <p className="text-muted-foreground mb-4">{collection.description}</p>
-          )}
+          <CollectionInlineEdit
+            collectionId={collection.id}
+            title={collection.title}
+            description={collection.description}
+            visibility={collection.visibility}
+            isOwner={isOwner}
+          />
           {owner && (
             <Link to={`/u/${owner.user_id}`} className="inline-flex items-center gap-2 hover:opacity-80">
               <Avatar className="h-6 w-6">
