@@ -177,3 +177,21 @@ export function useRemoveFromCollection() {
     },
   });
 }
+
+export function useReorderCollectionItems() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ collectionId, orderedItemIds }: { collectionId: string; orderedItemIds: string[] }) => {
+      // Update sort_order for each item
+      const updates = orderedItemIds.map((id, index) =>
+        supabase.from("collection_items").update({ sort_order: index }).eq("id", id)
+      );
+      const results = await Promise.all(updates);
+      const err = results.find((r) => r.error);
+      if (err?.error) throw err.error;
+    },
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ["collection-detail", vars.collectionId] });
+    },
+  });
+}
