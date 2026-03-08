@@ -15,12 +15,14 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Search, Heart, MessageCircle, Eye, TrendingUp, Clock, Star, Flame, Sparkles, LogIn, GitFork,
+  Search, Heart, MessageCircle, Eye, TrendingUp, Clock, Star, Flame, Sparkles, LogIn, GitFork, FolderPlus,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { FeaturedCarousel } from "@/components/FeaturedCarousel";
 import { TrendingSection } from "@/components/TrendingSection";
+import { ExploreCollectionsSection } from "@/components/ExploreCollectionsSection";
+import { SaveToCollectionDialog } from "@/components/SaveToCollectionDialog";
 
 function PromptCard({ prompt, onFork }: { prompt: any; onFork?: (id: string, name: string) => void }) {
   const { user } = useAuth();
