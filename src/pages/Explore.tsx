@@ -105,10 +105,21 @@ function PromptCard({ prompt, onFork }: { prompt: any; onFork?: (id: string, nam
                 {prompt.comment_count || 0}
               </span>
             </div>
-            <span className="flex items-center gap-1">
-              <Eye className="h-3.5 w-3.5" />
-              {prompt.view_count || 0}
-            </span>
+            <div className="flex items-center gap-2">
+              {user && onFork && (
+                <button
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); onFork(prompt.id, prompt.name); }}
+                  className="flex items-center gap-1 hover:text-primary transition-colors"
+                  title="Fork to your workspace"
+                >
+                  <GitFork className="h-3.5 w-3.5" />
+                </button>
+              )}
+              <span className="flex items-center gap-1">
+                <Eye className="h-3.5 w-3.5" />
+                {prompt.view_count || 0}
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>
