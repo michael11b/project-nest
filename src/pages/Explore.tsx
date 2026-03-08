@@ -120,6 +120,15 @@ function PromptCard({ prompt, onFork, onSave }: { prompt: any; onFork?: (id: str
               </span>
             </div>
             <div className="flex items-center gap-2">
+              {user && onSave && (
+                <button
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSave(prompt.id); }}
+                  className="flex items-center gap-1 hover:text-primary transition-colors"
+                  title="Save to collection"
+                >
+                  <FolderPlus className="h-3.5 w-3.5" />
+                </button>
+              )}
               {user && onFork && (
                 <button
                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); onFork(prompt.id, prompt.name); }}
