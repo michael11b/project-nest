@@ -28,6 +28,7 @@ import DriftTab from "./pages/DriftTab";
 import AuditLogsSettings from "./pages/AuditLogsSettings";
 import Explore from "./pages/Explore";
 import ExplorePromptDetail from "./pages/ExplorePromptDetail";
+import UserProfile from "./pages/UserProfile";
 import ProviderKeysSettings from "./pages/ProviderKeysSettings";
 import WorkspaceSettings from "./pages/WorkspaceSettings";
 import MembersSettings from "./pages/MembersSettings";
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/explore/:promptId" element={<ExplorePromptDetail />} />
+            <Route path="/u/:userId" element={<UserProfile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
