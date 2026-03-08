@@ -1,55 +1,41 @@
 
 
-# Audit Event Logging Triggers
+## Codebase Review Summary
 
-## Overview
-Create PostgreSQL triggers on key tables that automatically insert rows into `audit_events` whenever workspace actions occur. This removes the need for client-side audit logging and ensures consistent, tamper-resistant tracking.
+Your project is a **prompt management platform (prompts.so)** with workspaces, prompt versioning, test suites, eval runs, drift monitoring, releases, provider keys, API keys, audit logs, and member management. The code is well-structured and comprehensive.
 
-## Database Migration
+### What's Already Working
 
-A single migration adding a helper function and triggers for the following tables:
+- **Supabase is connected** to this project (project ID: `budkodsdznzmkdficboy`)
+- **4 database migrations** are in place covering all tables: profiles, workspaces, workspace_members, environments, prompts, prompt_versions, test_suites, test_cases, eval_runs, eval_results, releases, drift_policies, drift_alerts, api_keys, provider_keys, audit_events, idempotency_keys
+- **RLS policies** are properly configured with security-definer helper functions
+- **Auto-signup trigger** creates profile + personal workspace + default environments on new user registration
+- **Auth flow** (login/signup) with protected routes is implemented
+- **LOVABLE_API_KEY** secret is already available (for future AI features)
+- All frontend pages, hooks, layouts, and components are present and reference the correct Supabase tables
 
-### Helper Function: `log_audit_event`
-A `SECURITY DEFINER` function that inserts into `audit_events`. Triggers call this to bypass the INSERT RLS policy (which requires `auth.uid()` -- not available in all trigger contexts). The function uses `auth.uid()` as the actor when available, falling back to the row's user reference.
+### What Needs to Be Done
 
-### Triggers
+The codebase looks structurally sound. The main concern is whether the **migrations have been applied** to the new Supabase instance. Since this project was copied from another Lovable account, the migrations exist in the repo but may not have run against this project's database yet.
 
-| Table | Events | Action Logged | Target Type | Notes |
-|-------|--------|--------------|-------------|-------|
-| `prompts` | INSERT, UPDATE, DELETE | `prompt.created`, `prompt.updated`, `prompt.deleted` | `prompt` | `workspace_id` from row |
-| `prompt_versions` | INSERT, UPDATE | `version.created`, `version.updated` | `prompt_version` | `workspace_id` looked up via `prompts` |
-| `releases` | INSERT | `release.created` | `release` | `workspace_id` looked up via `environments` |
-| `workspace_members` | INSERT, DELETE | `member.added`, `member.removed` | `member` | `workspace_id` from row |
-| `test_suites` | INSERT, UPDATE, DELETE | `suite.created`, `suite.updated`, `suite.deleted` | `test_suite` | `workspace_id` looked up via `prompts` |
-| `drift_policies` | INSERT, UPDATE, DELETE | `drift_policy.created`, `drift_policy.updated`, `drift_policy.deleted` | `drift_policy` | `workspace_id` from row |
-| `provider_keys` | INSERT, UPDATE, DELETE | `provider_key.created`, `provider_key.updated`, `provider_key.deleted` | `provider_key` | `workspace_id` from row |
+#### Step 1: Verify and apply migrations
+- Check if migrations need to be re-applied to this Supabase instance. If the database is empty, we need to trigger migration execution. This typically happens automatically in Lovable Cloud, but we should verify by checking for any console/network errors when loading the app.
 
-### Metadata captured
-Each trigger stores relevant context in `metadata_json`:
-- For prompts: `{ "name": "...", "slug": "..." }`
-- For versions: `{ "version_number": N, "status": "..." }`
-- For releases: `{ "environment_id": "...", "version_id": "..." }`
-- For members: `{ "role": "...", "user_id": "..." }`
+#### Step 2: No code changes needed
+- The frontend code, hooks, types, and components all align with the database schema
+- Auth flow (login, signup, protected routes) is correctly wired
+- Workspace RBAC with security-definer functions follows best practices
+- All Supabase queries use the correct table/column names matching the generated types
 
-### Actor resolution
-- `auth.uid()` is used as actor (available during client-initiated operations)
-- For member changes, falls back to the acting admin's ID
+### Regarding Cloud/AI Setup
 
-## Updated File
+- **LOVABLE_API_KEY** is already provisioned as a secret -- Lovable Cloud is ready
+- The app currently has **no edge functions** -- if you want AI features (e.g., for eval runs that call LLM providers), we can add edge functions later using the Lovable AI Gateway
+- The provider_keys table stores user-provided API keys (BYOK pattern), which is separate from Lovable AI
 
-### `src/pages/AuditLogsSettings.tsx`
-Update the action filter dropdown to include the new trigger-generated action names so they appear in the filter options.
+### Recommended Next Steps
 
-## Technical Notes
-- Triggers use `AFTER` timing to avoid blocking the original operation
-- The audit insert function is `SECURITY DEFINER` to bypass RLS on `audit_events`
-- No code changes needed in hooks -- triggers fire server-side automatically
-- `OLD` record is used for DELETE, `NEW` for INSERT/UPDATE
-
-## Files Summary
-
-| File | Action |
-|------|--------|
-| Database migration | Create triggers + helper function |
-| `src/pages/AuditLogsSettings.tsx` | Update action filter list |
+1. **Test the app end-to-end**: Sign up, create a workspace, create a prompt, add versions -- verify the database is working
+2. If there are database errors, we'll need to ensure migrations are applied
+3. Add edge functions for eval run execution if needed (calling LLMs via provider keys or Lovable AI)
 
