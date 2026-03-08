@@ -236,13 +236,13 @@ serve(async (req) => {
                 Authorization: `Bearer ${LOVABLE_API_KEY}`,
                 "Content-Type": "application/json",
               },
-          body: JSON.stringify({
-            model: gatewayModel,
-            messages,
-            temperature,
-            max_completion_tokens: maxTokens,
-            stream: false,
-          }),
+              body: JSON.stringify({
+                model: gatewayModel,
+                messages,
+                ...(temperature !== 1 ? {} : {}),
+                max_completion_tokens: maxTokens,
+                stream: false,
+              }),
             });
             latencyMs = Date.now() - startTime;
 
