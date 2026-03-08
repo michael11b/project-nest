@@ -139,7 +139,11 @@ export default function ExplorePromptDetail() {
               <p className="text-muted-foreground text-sm mt-1">{prompt.description}</p>
             )}
           </div>
-          {!user && (
+          {user ? (
+            <Button size="sm" variant="outline" onClick={() => setForkOpen(true)}>
+              <GitFork className="h-4 w-4 mr-2" /> Fork
+            </Button>
+          ) : (
             <Link to="/login">
               <Button size="sm"><LogIn className="h-4 w-4 mr-2" /> Sign In</Button>
             </Link>
