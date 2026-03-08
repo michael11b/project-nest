@@ -48,6 +48,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/explore/:promptId" element={<ExplorePromptDetail />} />
+            <Route path="/u/:userId" element={<UserProfile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
