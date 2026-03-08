@@ -248,6 +248,9 @@ export default function Explore() {
                   </Button>
                 ))}
           </div>
+
+          {/* Featured carousel */}
+          <FeaturedCarousel />
         </div>
       </div>
 
