@@ -50,6 +50,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/explore/:promptId" element={<ExplorePromptDetail />} />
+            <Route path="/collections" element={<CollectionsList />} />
+            <Route path="/collections/:collectionId" element={<CollectionDetail />} />
             <Route path="/u/:userId" element={<UserProfile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
