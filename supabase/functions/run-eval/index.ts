@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { validateApiKey } from "../_shared/validate-api-key.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -155,26 +156,42 @@ serve(async (req) => {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Validate caller
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    // Validate caller — support both JWT auth and API key auth
+    const apiKeyHeader = req.headers.get("x-api-key");
+    let callerWorkspaceId: string | null = null;
 
-    const callerClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: claimsData, error: claimsError } = await callerClient.auth.getClaims(
-      authHeader.replace("Bearer ", "")
-    );
-    if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    if (apiKeyHeader) {
+      // API key authentication
+      const apiKeyResult = await validateApiKey(req);
+      if (!apiKeyResult.valid) {
+        return new Response(JSON.stringify({ error: apiKeyResult.error }), {
+          status: apiKeyResult.status,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      callerWorkspaceId = apiKeyResult.workspace_id;
+    } else {
+      // JWT authentication (existing flow)
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader?.startsWith("Bearer ")) {
+        return new Response(JSON.stringify({ error: "Unauthorized. Provide a JWT via Authorization header or an API key via X-API-Key header." }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const callerClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
+        global: { headers: { Authorization: authHeader } },
       });
+      const { data: claimsData, error: claimsError } = await callerClient.auth.getClaims(
+        authHeader.replace("Bearer ", "")
+      );
+      if (claimsError || !claimsData?.claims) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     // Use service role for DB operations
@@ -190,6 +207,15 @@ serve(async (req) => {
       .eq("id", eval_run_id)
       .single();
     if (runErr || !run) throw new Error("Eval run not found");
+
+    // If authenticated via API key, verify the run belongs to the same workspace
+    if (callerWorkspaceId && run.workspace_id !== callerWorkspaceId) {
+      return new Response(JSON.stringify({ error: "Forbidden: API key does not have access to this workspace" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (run.status !== "queued") {
       return new Response(JSON.stringify({ message: "Run already processed" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
