@@ -27,7 +27,7 @@ export default function Dashboard() {
     queryFn: async () => {
       const { data } = await supabase
         .from("eval_runs")
-        .select("id, status, score, model, created_at")
+        .select("id, status, score, model, created_at, prompt_version_id, prompt_versions(prompt_id)")
         .eq("workspace_id", workspace.id)
         .order("created_at", { ascending: false })
         .limit(5);
