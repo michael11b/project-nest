@@ -301,10 +301,24 @@ export default function Explore() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {prompts.map((p: any) => (
-              <PromptCard key={p.id} prompt={p} />
+              <PromptCard
+                key={p.id}
+                prompt={p}
+                onFork={(id, name) => setForkTarget({ id, name })}
+              />
             ))}
           </div>
         )}
+      </div>
+
+      {forkTarget && (
+        <ForkPromptDialog
+          open={!!forkTarget}
+          onOpenChange={(open) => { if (!open) setForkTarget(null); }}
+          promptId={forkTarget.id}
+          promptName={forkTarget.name}
+        />
+      )}
       </div>
     </div>
   );
