@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.drift-monitor]
 verify_jwt = false
+
+[functions.validate-api-key]
+verify_jwt = false
