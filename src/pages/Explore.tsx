@@ -166,6 +166,7 @@ export default function Explore() {
   const sort = (searchParams.get("sort") as SortOption) ?? "hot";
   const [searchInput, setSearchInput] = useState(search);
   const [forkTarget, setForkTarget] = useState<{ id: string; name: string } | null>(null);
+  const [savePromptId, setSavePromptId] = useState<string | null>(null);
 
   const { data: categories, isLoading: catsLoading } = useCategories();
   const {
