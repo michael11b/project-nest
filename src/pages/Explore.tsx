@@ -77,7 +77,7 @@ function PromptCard({ prompt, onFork }: { prompt: any; onFork?: (id: string, nam
             </Badge>
           )}
         </div>
-        <CardContent className="p-4 space-y-2">
+        <CardContent className="p-4 space-y-3">
           <h3 className="font-semibold text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
             {prompt.name}
           </h3>
@@ -90,6 +90,15 @@ function PromptCard({ prompt, onFork }: { prompt: any; onFork?: (id: string, nam
                 <Badge key={t} variant="secondary" className="text-[10px] px-1.5 py-0">{t}</Badge>
               ))}
             </div>
+          )}
+          {prompt.author_profile && (
+            <Link to={`/u/${prompt.created_by}`} onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 py-1 hover:opacity-80 transition-opacity">
+              <Avatar className="h-5 w-5">
+                <AvatarImage src={prompt.author_profile.avatar_url} alt={prompt.author_profile.display_name} />
+                <AvatarFallback className="text-[10px]">{(prompt.author_profile.display_name || "?").charAt(0).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <span className="text-xs text-muted-foreground hover:text-foreground">{prompt.author_profile.display_name || "Anonymous"}</span>
+            </Link>
           )}
           <div className="flex items-center justify-between pt-1 text-xs text-muted-foreground">
             <div className="flex items-center gap-3">
