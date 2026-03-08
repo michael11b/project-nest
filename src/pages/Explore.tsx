@@ -70,7 +70,7 @@ function PromptCard({ prompt }: { prompt: any }) {
             </div>
           )}
           {prompt.featured && (
-            <Badge className="absolute top-2 left-2 bg-amber-500/90 text-white border-0 text-xs">
+            <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground border-0 text-xs">
               <Star className="h-3 w-3 mr-1" /> Featured
             </Badge>
           )}
