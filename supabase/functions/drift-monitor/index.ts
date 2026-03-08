@@ -127,6 +127,42 @@ serve(async (req) => {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+    // Validate caller — support both JWT auth and API key auth
+    const apiKeyHeader = req.headers.get("x-api-key");
+    let callerWorkspaceId: string | null = null;
+
+    if (apiKeyHeader) {
+      const apiKeyResult = await validateApiKey(req);
+      if (!apiKeyResult.valid) {
+        return new Response(JSON.stringify({ error: apiKeyResult.error }), {
+          status: apiKeyResult.status,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      callerWorkspaceId = apiKeyResult.workspace_id;
+    } else {
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader?.startsWith("Bearer ")) {
+        return new Response(JSON.stringify({ error: "Unauthorized. Provide a JWT via Authorization header or an API key via X-API-Key header." }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const callerClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: claimsData, error: claimsError } = await callerClient.auth.getClaims(
+        authHeader.replace("Bearer ", "")
+      );
+      if (claimsError || !claimsData?.claims) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // Fetch all enabled drift policies
