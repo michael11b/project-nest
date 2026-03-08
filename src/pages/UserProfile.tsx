@@ -17,8 +17,10 @@ import {
   Globe,
   ArrowLeft,
   GitFork,
+  FolderOpen,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useUserCollections } from "@/hooks/useCollections";
 
 function useUserProfile(userId: string | undefined) {
   return useQuery({
