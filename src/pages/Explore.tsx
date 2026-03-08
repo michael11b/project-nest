@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { ForkPromptDialog } from "@/components/ForkPromptDialog";
 import { Link, useSearchParams } from "react-router-dom";
 import { usePublicPrompts, useCategories, type SortOption } from "@/hooks/usePublicPrompts";
 import { useAuth } from "@/hooks/useAuth";
