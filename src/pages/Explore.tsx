@@ -20,6 +20,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { FeaturedCarousel } from "@/components/FeaturedCarousel";
+import { TrendingSection } from "@/components/TrendingSection";
 
 function PromptCard({ prompt, onFork }: { prompt: any; onFork?: (id: string, name: string) => void }) {
   const { user } = useAuth();
@@ -278,6 +279,9 @@ export default function Explore() {
           <FeaturedCarousel />
         </div>
       </div>
+
+      {/* Trending this week */}
+      <TrendingSection />
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
