@@ -99,6 +99,78 @@ export type Database = {
           },
         ]
       }
+      collection_items: {
+        Row: {
+          added_at: string
+          collection_id: string
+          id: string
+          prompt_id: string
+          sort_order: number
+        }
+        Insert: {
+          added_at?: string
+          collection_id: string
+          id?: string
+          prompt_id: string
+          sort_order?: number
+        }
+        Update: {
+          added_at?: string
+          collection_id?: string
+          id?: string
+          prompt_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_items_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_items_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collections: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+          visibility: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          visibility?: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
       drift_alerts: {
         Row: {
           acknowledged_at: string | null
