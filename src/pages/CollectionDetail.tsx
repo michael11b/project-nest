@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Heart, Eye, Sparkles, Trash2, Globe, Lock, GripVertical } from "lucide-react";
+import CollectionCoverUpload from "@/components/CollectionCoverUpload";
 import {
   DndContext,
   closestCenter,
@@ -166,6 +167,17 @@ export default function CollectionDetail() {
         </div>
       </header>
 
+      {/* Cover image banner */}
+      {collection.cover_image_url && (
+        <div className="w-full h-48 md:h-64 bg-muted overflow-hidden">
+          <img
+            src={collection.cover_image_url}
+            alt={`${collection.title} cover`}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
       <div className="max-w-5xl mx-auto px-4 py-10">
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
@@ -190,11 +202,20 @@ export default function CollectionDetail() {
               <span className="text-sm text-muted-foreground">{owner.display_name || "Anonymous"}</span>
             </Link>
           )}
-          {isOwner && items.length > 1 && (
-            <p className="text-xs text-muted-foreground mt-3">
-              <GripVertical className="h-3 w-3 inline mr-1" />
-              Drag cards to reorder
-            </p>
+          {isOwner && (
+            <div className="mt-3 flex items-center gap-4">
+              <CollectionCoverUpload
+                collectionId={collection.id}
+                userId={user!.id}
+                currentUrl={collection.cover_image_url}
+              />
+              {items.length > 1 && (
+                <p className="text-xs text-muted-foreground">
+                  <GripVertical className="h-3 w-3 inline mr-1" />
+                  Drag cards to reorder
+                </p>
+              )}
+            </div>
           )}
         </div>
 
