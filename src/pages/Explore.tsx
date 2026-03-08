@@ -280,6 +280,9 @@ export default function Explore() {
         </div>
       </div>
 
+      {/* Trending this week */}
+      <TrendingSection />
+
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Filters bar */}
