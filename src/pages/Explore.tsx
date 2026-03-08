@@ -14,12 +14,12 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Search, Heart, MessageCircle, Eye, TrendingUp, Clock, Star, Flame, Sparkles, LogIn,
+  Search, Heart, MessageCircle, Eye, TrendingUp, Clock, Star, Flame, Sparkles, LogIn, GitFork,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
-function PromptCard({ prompt }: { prompt: any }) {
+function PromptCard({ prompt, onFork }: { prompt: any; onFork?: (id: string, name: string) => void }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [liking, setLiking] = useState(false);
