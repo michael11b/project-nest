@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
-import { useCollectionDetail, useRemoveFromCollection, useReorderCollectionItems, useUpdateCollection } from "@/hooks/useCollections";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useCollectionDetail, useRemoveFromCollection, useReorderCollectionItems, useDeleteCollection } from "@/hooks/useCollections";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +8,17 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Heart, Eye, Sparkles, Trash2, Globe, Lock, GripVertical } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import CollectionCoverUpload from "@/components/CollectionCoverUpload";
 import CollectionInlineEdit from "@/components/CollectionInlineEdit";
 import {
@@ -97,10 +108,12 @@ function SortablePromptCard({
 
 export default function CollectionDetail() {
   const { collectionId } = useParams<{ collectionId: string }>();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { data: collection, isLoading } = useCollectionDetail(collectionId);
   const removeItem = useRemoveFromCollection();
   const reorderItems = useReorderCollectionItems();
+  const deleteCollection = useDeleteCollection();
   const [localItems, setLocalItems] = useState<any[] | null>(null);
 
   const sensors = useSensors(
@@ -198,7 +211,7 @@ export default function CollectionDetail() {
             </Link>
           )}
           {isOwner && (
-            <div className="mt-3 flex items-center gap-4">
+            <div className="mt-3 flex items-center gap-4 flex-wrap">
               <CollectionCoverUpload
                 collectionId={collection.id}
                 userId={user!.id}
@@ -210,6 +223,30 @@ export default function CollectionDetail() {
                   Drag cards to reorder
                 </p>
               )}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 ml-auto">
+                    <Trash2 className="h-4 w-4 mr-1" /> Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete collection?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete "{collection.title}" and remove all its prompt associations. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      onClick={() => deleteCollection.mutate(collection.id, { onSuccess: () => navigate("/collections") })}
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           )}
         </div>
