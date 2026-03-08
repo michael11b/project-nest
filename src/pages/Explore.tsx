@@ -20,6 +20,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { FeaturedCarousel } from "@/components/FeaturedCarousel";
+import { TrendingSection } from "@/components/TrendingSection";
 
 function PromptCard({ prompt, onFork }: { prompt: any; onFork?: (id: string, name: string) => void }) {
   const { user } = useAuth();
