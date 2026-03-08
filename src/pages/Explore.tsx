@@ -319,7 +319,6 @@ export default function Explore() {
           promptName={forkTarget.name}
         />
       )}
-      </div>
     </div>
   );
 }
