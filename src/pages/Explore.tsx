@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { FeaturedCarousel } from "@/components/FeaturedCarousel";
 
 function PromptCard({ prompt, onFork }: { prompt: any; onFork?: (id: string, name: string) => void }) {
   const { user } = useAuth();
@@ -247,6 +248,9 @@ export default function Explore() {
                   </Button>
                 ))}
           </div>
+
+          {/* Featured carousel */}
+          <FeaturedCarousel />
         </div>
       </div>
 
