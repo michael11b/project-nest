@@ -142,6 +142,7 @@ export default function Explore() {
   const tag = searchParams.get("tag") ?? "";
   const sort = (searchParams.get("sort") as SortOption) ?? "hot";
   const [searchInput, setSearchInput] = useState(search);
+  const [forkTarget, setForkTarget] = useState<{ id: string; name: string } | null>(null);
 
   const { data: categories, isLoading: catsLoading } = useCategories();
   const { data: prompts, isLoading } = usePublicPrompts({
