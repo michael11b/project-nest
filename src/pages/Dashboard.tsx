@@ -86,11 +86,16 @@ export default function Dashboard() {
             {recentPrompts?.length ? (
               <ul className="space-y-2">
                 {recentPrompts.map((p) => (
-                  <li key={p.id} className="flex items-center justify-between text-sm">
-                    <span className="truncate font-medium">{p.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(p.updated_at).toLocaleDateString()}
-                    </span>
+                  <li key={p.id}>
+                    <Link
+                      to={`/w/${workspace.slug}/prompts/${p.id}`}
+                      className="flex items-center justify-between text-sm rounded-md px-2 py-1.5 -mx-2 hover:bg-accent transition-colors"
+                    >
+                      <span className="truncate font-medium">{p.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(p.updated_at).toLocaleDateString()}
+                      </span>
+                    </Link>
                   </li>
                 ))}
               </ul>
