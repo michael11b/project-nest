@@ -155,6 +155,7 @@ export default function Explore() {
   const [searchInput, setSearchInput] = useState(search);
   const [forkTarget, setForkTarget] = useState<{ id: string; name: string } | null>(null);
 
+  const { data: categories, isLoading: catsLoading } = useCategories();
   const {
     data,
     isLoading,
