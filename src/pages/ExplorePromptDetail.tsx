@@ -24,6 +24,7 @@ export default function ExplorePromptDetail() {
   const queryClient = useQueryClient();
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [forkOpen, setForkOpen] = useState(false);
 
   const { data: prompt, isLoading } = useQuery({
     queryKey: ["public-prompt", promptId],
