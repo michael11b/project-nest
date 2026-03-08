@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Heart, Eye, Sparkles, Trash2, Globe, Lock, GripVertical } from "lucide-react";
 import CollectionCoverUpload from "@/components/CollectionCoverUpload";
+import CollectionInlineEdit from "@/components/CollectionInlineEdit";
 import {
   DndContext,
   closestCenter,
