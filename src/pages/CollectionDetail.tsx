@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useCollectionDetail, useRemoveFromCollection, useReorderCollectionItems } from "@/hooks/useCollections";
+import { useCollectionDetail, useRemoveFromCollection, useReorderCollectionItems, useUpdateCollection } from "@/hooks/useCollections";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
