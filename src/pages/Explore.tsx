@@ -94,7 +94,7 @@ function PromptCard({ prompt }: { prompt: any }) {
               <button
                 onClick={toggleLike}
                 disabled={liking}
-                className="flex items-center gap-1 hover:text-red-500 transition-colors"
+                className="flex items-center gap-1 hover:text-destructive transition-colors"
               >
                 <Heart className="h-3.5 w-3.5" />
                 {prompt.like_count || 0}
