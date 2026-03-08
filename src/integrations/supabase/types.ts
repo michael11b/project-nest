@@ -717,6 +717,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "prompts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "prompts_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
