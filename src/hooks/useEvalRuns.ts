@@ -92,8 +92,33 @@ export function useCreateEvalRun() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: TablesInsert<"eval_runs">) => {
+      // 1. Create the eval run row
       const { data, error } = await supabase.from("eval_runs").insert(input).select().single();
       if (error) throw error;
+
+      // 2. Invoke the edge function to process it (fire-and-forget style but catch errors)
+      const FUNCTIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/run-eval`;
+      try {
+        const session = (await supabase.auth.getSession()).data.session;
+        const resp = await fetch(FUNCTIONS_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ eval_run_id: data.id }),
+        });
+
+        if (!resp.ok) {
+          const errBody = await resp.json().catch(() => ({ error: "Unknown error" }));
+          console.error("run-eval function error:", errBody);
+          // Don't throw — the run is created and can be retried
+        }
+      } catch (e) {
+        console.error("Failed to invoke run-eval:", e);
+      }
+
       return data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["eval-runs"] }),
