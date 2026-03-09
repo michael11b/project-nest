@@ -17,6 +17,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ForkPromptDialog } from "@/components/ForkPromptDialog";
+import { useRecordPromptView } from "@/hooks/useRecordPromptView";
 
 export default function ExplorePromptDetail() {
   const { promptId } = useParams<{ promptId: string }>();
