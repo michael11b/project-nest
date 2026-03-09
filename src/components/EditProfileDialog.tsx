@@ -43,7 +43,7 @@ interface Props {
     bio: string | null;
     website: string | null;
     avatar_url: string | null;
-    notification_prefs?: NotificationPrefs | null;
+    notification_prefs?: any;
   };
 }
 
