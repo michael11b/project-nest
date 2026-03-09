@@ -2,9 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/hooks/useWorkspace";
+import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Play, Layers, AlertTriangle } from "lucide-react";
+import { FileText, Play, Layers, AlertTriangle, Clock } from "lucide-react";
 
 export default function Dashboard() {
   const { workspace } = useWorkspace();
