@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +24,7 @@ interface Props {
 export function CreateCollectionDialog({ open, onOpenChange }: Props) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [visibility, setVisibility] = useState<"private" | "public" | "workspace">("private");
   const createCollection = useCreateCollection();
   const { toast } = useToast();
 
@@ -33,13 +35,14 @@ export function CreateCollectionDialog({ open, onOpenChange }: Props) {
       {
         title: title.trim(),
         description: description.trim() || undefined,
-        visibility: "private",
+        visibility,
       },
       {
         onSuccess: () => {
           toast({ title: "Success", description: "Collection created!" });
           setTitle("");
           setDescription("");
+          setVisibility("private");
           onOpenChange(false);
         },
         onError: (error) => {
@@ -83,6 +86,24 @@ export function CreateCollectionDialog({ open, onOpenChange }: Props) {
               rows={3}
             />
             <p className="text-xs text-muted-foreground">{description.length}/2000</p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="coll-visibility">Visibility</Label>
+            <Select value={visibility} onValueChange={(v) => setVisibility(v as "private" | "public" | "workspace")}>
+              <SelectTrigger id="coll-visibility">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="private">Private</SelectItem>
+                <SelectItem value="workspace">Workspace</SelectItem>
+                <SelectItem value="public">Public</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              {visibility === "private" && "Only you can access this collection."}
+              {visibility === "workspace" && "Your workspace members can access this collection."}
+              {visibility === "public" && "Anyone can view this collection."}
+            </p>
           </div>
         </div>
         <DialogFooter>
