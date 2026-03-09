@@ -176,5 +176,6 @@ export default function CollectionsList() {
         )}
       </div>
     </div>
+    </>
   );
 }
