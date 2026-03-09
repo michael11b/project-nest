@@ -204,7 +204,20 @@ export default function UserProfile() {
   const { data: followingCount } = useFollowingCount(userId);
   const { data: isFollowing } = useIsFollowing(user?.id, userId);
   const { data: collections } = useUserCollections(userId);
-  const { data: activity, isLoading: activityLoading } = useUserActivity(userId);
+  const { data: activityData, isLoading: activityLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useUserActivity(userId);
+  const activity = activityData?.pages.flatMap((p) => p.items) ?? [];
+
+  // Infinite scroll observer
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!loadMoreRef.current || !hasNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) fetchNextPage(); },
+      { threshold: 0.5 }
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
 
   const followMutation = useMutation({
     mutationFn: async () => {
