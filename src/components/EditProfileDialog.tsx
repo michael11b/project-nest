@@ -59,6 +59,15 @@ export function EditProfileDialog({ open, onOpenChange, profile }: Props) {
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>(() => {
+    const raw = profile.notification_prefs;
+    if (raw && typeof raw === "object" && !Array.isArray(raw)) return { ...defaultPrefs, ...raw } as NotificationPrefs;
+    return { ...defaultPrefs };
+  });
+
+  const togglePref = (key: keyof NotificationPrefs) => {
+    setNotifPrefs((p) => ({ ...p, [key]: !p[key] }));
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
