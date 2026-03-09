@@ -21,6 +21,7 @@ import {
   GitFork,
   FolderOpen,
   Activity,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useUserCollections } from "@/hooks/useCollections";
