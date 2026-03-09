@@ -27,15 +27,6 @@ export function GlobalSearch() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Try workspace context — may not exist on public pages
-  let workspaceSlug: string | undefined;
-  try {
-    const { workspace } = useWorkspace();
-    workspaceSlug = workspace?.slug;
-  } catch {
-    workspaceSlug = undefined;
-  }
-
   // Keyboard shortcut: Cmd/Ctrl + K
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
