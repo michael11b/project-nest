@@ -10,7 +10,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Plus, GitCompare } from "lucide-react";
+import { Plus, GitCompare, Undo2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { format } from "date-fns";
 import { VersionCompareDialog } from "@/components/VersionCompareDialog";
 
