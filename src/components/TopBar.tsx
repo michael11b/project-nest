@@ -1,5 +1,6 @@
 import { useLocation, Link } from "react-router-dom";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, Moon, Sun, Monitor } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -26,6 +27,7 @@ export function TopBar() {
   const { profile, signOut } = useAuth();
   const { workspace } = useWorkspace();
   const location = useLocation();
+  const { theme, setTheme } = useTheme();
 
   // Build breadcrumb segments from the path after /w/:slug
   const segments = location.pathname
@@ -87,6 +89,11 @@ export function TopBar() {
             <p className="text-sm font-medium">{profile?.display_name ?? "User"}</p>
             <p className="text-xs text-muted-foreground truncate">{profile?.email}</p>
           </div>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+            {theme === "dark" ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
+            {theme === "dark" ? "Light Mode" : "Dark Mode"}
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={signOut}>
             <LogOut className="mr-2 h-4 w-4" />
