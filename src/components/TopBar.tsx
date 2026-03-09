@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { GlobalSearch } from "@/components/GlobalSearch";
 
 export function TopBar() {
   const { profile, signOut } = useAuth();
@@ -75,6 +76,8 @@ export function TopBar() {
           })}
         </BreadcrumbList>
       </Breadcrumb>
+
+      <GlobalSearch />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
