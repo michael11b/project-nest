@@ -141,13 +141,21 @@ function useUserActivity(userId: string | undefined) {
       // Recent follows
       const { data: follows } = await supabase
         .from("user_follows")
-        .select("created_at, following_id, profiles:profiles!user_follows_following_id_fkey(display_name)")
+        .select("created_at, following_id")
         .eq("follower_id", userId!)
         .order("created_at", { ascending: false })
         .limit(20);
-      for (const f of follows ?? []) {
-        const name = (f as any).profiles?.display_name ?? "someone";
-        items.push({ type: "follow", created_at: f.created_at, detail: `Followed ${name}`, link: `/u/${f.following_id}` });
+      if (follows?.length) {
+        const followIds = follows.map((f) => f.following_id);
+        const { data: followProfiles } = await supabase
+          .from("profiles")
+          .select("user_id, display_name")
+          .in("user_id", followIds);
+        const profileMap = new Map((followProfiles ?? []).map((p) => [p.user_id, p.display_name]));
+        for (const f of follows) {
+          const name = profileMap.get(f.following_id) ?? "someone";
+          items.push({ type: "follow", created_at: f.created_at, detail: `Followed ${name}`, link: `/u/${f.following_id}` });
+        }
       }
 
       items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
