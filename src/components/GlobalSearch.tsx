@@ -158,7 +158,7 @@ export function GlobalSearch() {
           onValueChange={setQuery}
         />
         <CommandList>
-          {loading && <CommandLoading>Searching...</CommandLoading>}
+          {loading && <div className="py-6 text-center text-sm text-muted-foreground">Searching...</div>}
           <CommandEmpty>
             {query.trim().length < 2 ? "Type at least 2 characters..." : "No results found."}
           </CommandEmpty>
