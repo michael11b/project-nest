@@ -224,8 +224,22 @@ export default function CollectionDetail() {
               </Avatar>
               <span className="text-sm text-muted-foreground">{owner.display_name || "Anonymous"}</span>
             </Link>
-          )}
-          {isOwner && (
+           )}
+          <div className="flex items-center gap-6 mt-4 text-sm text-muted-foreground flex-wrap">
+            <div className="flex items-center gap-2">
+              <EyeIcon className="h-4 w-4" />
+              <span>{collection.view_count ?? 0} view{(collection.view_count ?? 0) !== 1 ? "s" : ""}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              <span>Added {new Date(collection.created_at).toLocaleDateString()}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              <span>{items.length} prompt{items.length !== 1 ? "s" : ""}</span>
+            </div>
+          </div>
+           {isOwner && (
             <div className="mt-3 flex items-center gap-4 flex-wrap">
               <CollectionCoverUpload
                 collectionId={collection.id}
