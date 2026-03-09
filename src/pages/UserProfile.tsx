@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   GitFork,
   FolderOpen,
+  Activity,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useUserCollections } from "@/hooks/useCollections";
@@ -105,6 +106,65 @@ function useIsFollowing(currentUserId: string | undefined, targetUserId: string 
   });
 }
 
+type ActivityItem = { type: "like" | "comment" | "follow"; created_at: string; detail: string; link?: string };
+
+function useUserActivity(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["user-activity", userId],
+    queryFn: async () => {
+      const items: ActivityItem[] = [];
+
+      // Recent likes
+      const { data: likes } = await supabase
+        .from("prompt_likes")
+        .select("created_at, prompt_id, prompts:prompts(name)")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      for (const l of likes ?? []) {
+        const name = (l as any).prompts?.name ?? "a prompt";
+        items.push({ type: "like", created_at: l.created_at, detail: `Liked "${name}"`, link: `/explore/${l.prompt_id}` });
+      }
+
+      // Recent comments
+      const { data: comments } = await supabase
+        .from("prompt_comments")
+        .select("created_at, prompt_id, content, prompts:prompts(name)")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      for (const c of comments ?? []) {
+        const name = (c as any).prompts?.name ?? "a prompt";
+        items.push({ type: "comment", created_at: c.created_at, detail: `Commented on "${name}"`, link: `/explore/${c.prompt_id}` });
+      }
+
+      // Recent follows
+      const { data: follows } = await supabase
+        .from("user_follows")
+        .select("created_at, following_id")
+        .eq("follower_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (follows?.length) {
+        const followIds = follows.map((f) => f.following_id);
+        const { data: followProfiles } = await supabase
+          .from("profiles")
+          .select("user_id, display_name")
+          .in("user_id", followIds);
+        const profileMap = new Map((followProfiles ?? []).map((p) => [p.user_id, p.display_name]));
+        for (const f of follows) {
+          const name = profileMap.get(f.following_id) ?? "someone";
+          items.push({ type: "follow", created_at: f.created_at, detail: `Followed ${name}`, link: `/u/${f.following_id}` });
+        }
+      }
+
+      items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      return items.slice(0, 30);
+    },
+    enabled: !!userId,
+  });
+}
+
 export default function UserProfile() {
   const { userId } = useParams<{ userId: string }>();
   const { user } = useAuth();
@@ -117,6 +177,7 @@ export default function UserProfile() {
   const { data: followingCount } = useFollowingCount(userId);
   const { data: isFollowing } = useIsFollowing(user?.id, userId);
   const { data: collections } = useUserCollections(userId);
+  const { data: activity, isLoading: activityLoading } = useUserActivity(userId);
 
   const followMutation = useMutation({
     mutationFn: async () => {
@@ -267,6 +328,7 @@ export default function UserProfile() {
             <TabsTrigger value="collections">
               Collections ({collections?.filter((c: any) => c.visibility === "public").length ?? 0})
             </TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>
 
           <TabsContent value="prompts" className="mt-4">
@@ -337,6 +399,44 @@ export default function UserProfile() {
                       </Card>
                     </Link>
                   ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="activity" className="mt-4">
+            {activityLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} className="h-12 rounded-md" />
+                ))}
+              </div>
+            ) : !activity?.length ? (
+              <p className="text-muted-foreground text-center py-12">No recent activity.</p>
+            ) : (
+              <div className="space-y-1">
+                {activity.map((item, i) => (
+                  <Link
+                    key={i}
+                    to={item.link ?? "#"}
+                    className="flex items-center gap-3 rounded-md p-3 hover:bg-accent transition-colors"
+                  >
+                    <div className="flex-shrink-0">
+                      {item.type === "like" && <Heart className="h-4 w-4 text-red-500" />}
+                      {item.type === "comment" && <MessageSquare className="h-4 w-4 text-blue-500" />}
+                      {item.type === "follow" && <UserPlus className="h-4 w-4 text-green-500" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-foreground truncate">{item.detail}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(item.created_at).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
               </div>
             )}
           </TabsContent>
