@@ -7,11 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
+import { useRecordPromptView } from "@/hooks/useRecordPromptView";
 
 export default function PromptOverview() {
   const { prompt } = usePrompt();
   const { data: latestVersion, isLoading: vLoading } = useLatestVersion(prompt.id);
   const { workspace } = useWorkspace();
+  useRecordPromptView(prompt.id);
 
   const { data: environments } = useQuery({
     queryKey: ["environments", workspace.id],

@@ -17,6 +17,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ForkPromptDialog } from "@/components/ForkPromptDialog";
+import { useRecordPromptView } from "@/hooks/useRecordPromptView";
 
 export default function ExplorePromptDetail() {
   const { promptId } = useParams<{ promptId: string }>();
@@ -25,6 +26,7 @@ export default function ExplorePromptDetail() {
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [forkOpen, setForkOpen] = useState(false);
+  useRecordPromptView(promptId);
 
   const { data: prompt, isLoading } = useQuery({
     queryKey: ["public-prompt", promptId],
