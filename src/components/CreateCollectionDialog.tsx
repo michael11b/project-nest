@@ -87,6 +87,24 @@ export function CreateCollectionDialog({ open, onOpenChange }: Props) {
             />
             <p className="text-xs text-muted-foreground">{description.length}/2000</p>
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="coll-visibility">Visibility</Label>
+            <Select value={visibility} onValueChange={(v) => setVisibility(v as "private" | "public" | "workspace")}>
+              <SelectTrigger id="coll-visibility">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="private">Private</SelectItem>
+                <SelectItem value="workspace">Workspace</SelectItem>
+                <SelectItem value="public">Public</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              {visibility === "private" && "Only you can access this collection."}
+              {visibility === "workspace" && "Your workspace members can access this collection."}
+              {visibility === "public" && "Anyone can view this collection."}
+            </p>
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
