@@ -26,6 +26,7 @@ export default function ExplorePromptDetail() {
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [forkOpen, setForkOpen] = useState(false);
+  useRecordPromptView(promptId);
 
   const { data: prompt, isLoading } = useQuery({
     queryKey: ["public-prompt", promptId],
