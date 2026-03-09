@@ -303,8 +303,12 @@ export default function UserProfile() {
             )}
           </div>
 
-          {/* Follow button */}
-          {user && user.id !== userId && (
+          {/* Follow / Edit button */}
+          {isOwnProfile ? (
+            <Button variant="outline" onClick={() => setEditProfileOpen(true)} className="min-w-[120px]">
+              <Pencil className="h-4 w-4 mr-1" /> Edit Profile
+            </Button>
+          ) : user && user.id !== userId ? (
             <Button
               variant={isFollowing ? "outline" : "default"}
               onClick={() => followMutation.mutate()}
@@ -317,13 +321,20 @@ export default function UserProfile() {
                 <><UserPlus className="h-4 w-4 mr-1" /> Follow</>
               )}
             </Button>
-          )}
-          {!user && (
+          ) : !user ? (
             <Button variant="outline" asChild>
               <Link to="/login">Sign in to follow</Link>
             </Button>
-          )}
+          ) : null}
         </div>
+
+        {isOwnProfile && profile && (
+          <EditProfileDialog
+            open={editProfileOpen}
+            onOpenChange={setEditProfileOpen}
+            profile={profile}
+          />
+        )}
 
         {/* Tabs */}
         <Tabs defaultValue="prompts" className="mt-2">
