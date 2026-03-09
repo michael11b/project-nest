@@ -126,6 +126,17 @@ export default function CollectionDetail() {
   );
 
   const items = localItems ?? collection?.items ?? [];
+
+  // Increment view count on first load
+  useEffect(() => {
+    if (collection && !viewCountIncremented && !isOwner) {
+      setViewCountIncremented(true);
+      updateCollection.mutate({
+        id: collection.id,
+        view_count: (collection.view_count ?? 0) + 1,
+      });
+    }
+  }, [collection?.id, viewCountIncremented, isOwner, updateCollection]);
   const isOwner = user?.id === collection?.user_id;
 
   const handleDragEnd = useCallback(
