@@ -9,6 +9,22 @@ import { FileText, Play, Layers, AlertTriangle, Clock } from "lucide-react";
 
 export default function Dashboard() {
   const { workspace } = useWorkspace();
+  const { user } = useAuth();
+
+  const { data: recentlyViewed } = useQuery({
+    queryKey: ["recently-viewed", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("prompt_views")
+        .select("prompt_id, viewed_at, prompts:prompts(id, name, slug, workspace_id, workspaces:workspaces(slug))")
+        .eq("user_id", user!.id)
+        .order("viewed_at", { ascending: false })
+        .limit(5);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!user,
+  });
 
   const { data: recentPrompts } = useQuery({
     queryKey: ["dashboard-prompts", workspace.id],
