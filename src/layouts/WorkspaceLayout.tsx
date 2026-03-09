@@ -1,9 +1,34 @@
+import { useState } from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useWorkspaceFromParams, WorkspaceContext } from "@/hooks/useWorkspace";
 import { AppSidebar } from "@/components/AppSidebar";
 import { TopBar } from "@/components/TopBar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { KeyboardShortcutsDialog } from "@/components/KeyboardShortcutsDialog";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+
+function WorkspaceShell() {
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  useKeyboardShortcuts(() => setShortcutsOpen(true));
+
+  return (
+    <>
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full">
+          <AppSidebar />
+          <SidebarInset>
+            <TopBar />
+            <div className="flex-1 p-6">
+              <Outlet />
+            </div>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+      <KeyboardShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
+    </>
+  );
+}
 
 export default function WorkspaceLayout() {
   const { workspace, role, isLoading, notFound } = useWorkspaceFromParams();
@@ -22,17 +47,7 @@ export default function WorkspaceLayout() {
 
   return (
     <WorkspaceContext.Provider value={{ workspace, role }}>
-      <SidebarProvider>
-        <div className="flex min-h-screen w-full">
-          <AppSidebar />
-          <SidebarInset>
-            <TopBar />
-            <div className="flex-1 p-6">
-              <Outlet />
-            </div>
-          </SidebarInset>
-        </div>
-      </SidebarProvider>
+      <WorkspaceShell />
     </WorkspaceContext.Provider>
   );
 }
