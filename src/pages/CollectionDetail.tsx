@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useCollectionDetail, useRemoveFromCollection, useReorderCollectionItems, useDeleteCollection } from "@/hooks/useCollections";
+import { useCollectionDetail, useRemoveFromCollection, useReorderCollectionItems, useDeleteCollection, useUpdateCollection } from "@/hooks/useCollections";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Copy, Heart, Eye, Sparkles, Trash2, Globe, Lock, GripVertical } from "lucide-react";
+import { ArrowLeft, Copy, Eye, Heart, Eye as EyeIcon, Sparkles, Trash2, Globe, Lock, GripVertical, Calendar } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
