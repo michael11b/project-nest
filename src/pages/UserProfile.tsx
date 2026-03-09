@@ -394,6 +394,44 @@ export default function UserProfile() {
               </div>
             )}
           </TabsContent>
+
+          <TabsContent value="activity" className="mt-4">
+            {activityLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} className="h-12 rounded-md" />
+                ))}
+              </div>
+            ) : !activity?.length ? (
+              <p className="text-muted-foreground text-center py-12">No recent activity.</p>
+            ) : (
+              <div className="space-y-1">
+                {activity.map((item, i) => (
+                  <Link
+                    key={i}
+                    to={item.link ?? "#"}
+                    className="flex items-center gap-3 rounded-md p-3 hover:bg-accent transition-colors"
+                  >
+                    <div className="flex-shrink-0">
+                      {item.type === "like" && <Heart className="h-4 w-4 text-red-500" />}
+                      {item.type === "comment" && <MessageSquare className="h-4 w-4 text-blue-500" />}
+                      {item.type === "follow" && <UserPlus className="h-4 w-4 text-green-500" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-foreground truncate">{item.detail}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(item.created_at).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </TabsContent>
         </Tabs>
       </div>
     </div>
