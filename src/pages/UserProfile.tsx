@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   GitFork,
   FolderOpen,
+  Activity,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useUserCollections } from "@/hooks/useCollections";
