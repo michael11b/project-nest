@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useCollectionDetail, useRemoveFromCollection, useReorderCollectionItems, useDeleteCollection } from "@/hooks/useCollections";
+import { useCollectionDetail, useRemoveFromCollection, useReorderCollectionItems, useDeleteCollection, useUpdateCollection } from "@/hooks/useCollections";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Copy, Heart, Eye, Sparkles, Trash2, Globe, Lock, GripVertical } from "lucide-react";
+import { ArrowLeft, Copy, Eye, Heart, Eye as EyeIcon, Sparkles, Trash2, Globe, Lock, GripVertical, Calendar } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -116,7 +116,11 @@ export default function CollectionDetail() {
   const removeItem = useRemoveFromCollection();
   const reorderItems = useReorderCollectionItems();
   const deleteCollection = useDeleteCollection();
+  const updateCollection = useUpdateCollection();
   const [localItems, setLocalItems] = useState<any[] | null>(null);
+  const [viewCountIncremented, setViewCountIncremented] = useState(false);
+  
+  const isOwner = user && collection && collection.user_id === user.id;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -124,7 +128,17 @@ export default function CollectionDetail() {
   );
 
   const items = localItems ?? collection?.items ?? [];
-  const isOwner = user?.id === collection?.user_id;
+
+  // Increment view count on first load
+  useEffect(() => {
+    if (collection && !viewCountIncremented && !isOwner) {
+      setViewCountIncremented(true);
+      updateCollection.mutate({
+        id: collection.id,
+        view_count: (collection.view_count ?? 0) + 1,
+      });
+    }
+  }, [collection?.id, viewCountIncremented, isOwner, updateCollection]);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -211,8 +225,22 @@ export default function CollectionDetail() {
               </Avatar>
               <span className="text-sm text-muted-foreground">{owner.display_name || "Anonymous"}</span>
             </Link>
-          )}
-          {isOwner && (
+           )}
+          <div className="flex items-center gap-6 mt-4 text-sm text-muted-foreground flex-wrap">
+            <div className="flex items-center gap-2">
+              <EyeIcon className="h-4 w-4" />
+              <span>{collection.view_count ?? 0} view{(collection.view_count ?? 0) !== 1 ? "s" : ""}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              <span>Added {new Date(collection.created_at).toLocaleDateString()}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              <span>{items.length} prompt{items.length !== 1 ? "s" : ""}</span>
+            </div>
+          </div>
+           {isOwner && (
             <div className="mt-3 flex items-center gap-4 flex-wrap">
               <CollectionCoverUpload
                 collectionId={collection.id}
