@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Heart,
@@ -248,80 +249,87 @@ export default function UserProfile() {
           )}
         </div>
 
-        {/* Public prompts */}
-        <h2 className="text-lg font-semibold text-foreground mb-4">Public Prompts</h2>
+        {/* Tabs */}
+        <Tabs defaultValue="prompts" className="mt-2">
+          <TabsList>
+            <TabsTrigger value="prompts">Prompts ({prompts?.length ?? 0})</TabsTrigger>
+            <TabsTrigger value="collections">
+              Collections ({collections?.filter((c: any) => c.visibility === "public").length ?? 0})
+            </TabsTrigger>
+          </TabsList>
 
-        {promptsLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-40 rounded-lg" />
-            ))}
-          </div>
-        ) : !prompts?.length ? (
-          <p className="text-muted-foreground text-center py-12">No public prompts yet.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {prompts.map((prompt) => (
-              <Link key={prompt.id} to={`/explore/${prompt.id}`}>
-                <Card className="hover:shadow-md transition-shadow h-full">
-                  <CardContent className="p-5">
-                    <h3 className="font-semibold text-foreground truncate mb-1">{prompt.name}</h3>
-                    {prompt.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                        {prompt.description}
-                      </p>
-                    )}
-                    {prompt.tags && prompt.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {prompt.tags.slice(0, 3).map((tag: string) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Heart className="h-3 w-3" /> {prompt.like_count}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Eye className="h-3 w-3" /> {prompt.view_count}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MessageSquare className="h-3 w-3" /> {prompt.comment_count}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        )}
-
-        {/* Public collections */}
-        {collections && collections.filter((c: any) => c.visibility === "public").length > 0 && (
-          <>
-            <h2 className="text-lg font-semibold text-foreground mb-4 mt-10 flex items-center gap-2">
-              <FolderOpen className="h-5 w-5" /> Collections
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {collections
-                .filter((c: any) => c.visibility === "public")
-                .map((c: any) => (
-                  <Link key={c.id} to={`/collections/${c.id}`}>
+          <TabsContent value="prompts" className="mt-4">
+            {promptsLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-40 rounded-lg" />
+                ))}
+              </div>
+            ) : !prompts?.length ? (
+              <p className="text-muted-foreground text-center py-12">No public prompts yet.</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {prompts.map((prompt) => (
+                  <Link key={prompt.id} to={`/explore/${prompt.id}`}>
                     <Card className="hover:shadow-md transition-shadow h-full">
                       <CardContent className="p-5">
-                        <h3 className="font-semibold text-foreground truncate mb-1">{c.title}</h3>
-                        {c.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2">{c.description}</p>
+                        <h3 className="font-semibold text-foreground truncate mb-1">{prompt.name}</h3>
+                        {prompt.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                            {prompt.description}
+                          </p>
                         )}
+                        {prompt.tags && prompt.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {prompt.tags.slice(0, 3).map((tag: string) => (
+                              <Badge key={tag} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Heart className="h-3 w-3" /> {prompt.like_count}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Eye className="h-3 w-3" /> {prompt.view_count}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MessageSquare className="h-3 w-3" /> {prompt.comment_count}
+                          </span>
+                        </div>
                       </CardContent>
                     </Card>
                   </Link>
                 ))}
-            </div>
-          </>
-        )}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="collections" className="mt-4">
+            {!collections?.filter((c: any) => c.visibility === "public").length ? (
+              <p className="text-muted-foreground text-center py-12">No public collections yet.</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {collections
+                  .filter((c: any) => c.visibility === "public")
+                  .map((c: any) => (
+                    <Link key={c.id} to={`/collections/${c.id}`}>
+                      <Card className="hover:shadow-md transition-shadow h-full">
+                        <CardContent className="p-5">
+                          <h3 className="font-semibold text-foreground truncate mb-1">{c.title}</h3>
+                          {c.description && (
+                            <p className="text-sm text-muted-foreground line-clamp-2">{c.description}</p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
