@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -110,59 +110,82 @@ function useIsFollowing(currentUserId: string | undefined, targetUserId: string 
 
 type ActivityItem = { type: "like" | "comment" | "follow"; created_at: string; detail: string; link?: string };
 
+const ACTIVITY_PAGE_SIZE = 20;
+
+async function fetchActivityPage(userId: string, cursor: string | null): Promise<{ items: ActivityItem[]; nextCursor: string | null }> {
+  const items: ActivityItem[] = [];
+
+  // Build queries with cursor-based pagination
+  let likesQuery = supabase
+    .from("prompt_likes")
+    .select("created_at, prompt_id, prompts:prompts(name)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(ACTIVITY_PAGE_SIZE + 1);
+
+  let commentsQuery = supabase
+    .from("prompt_comments")
+    .select("created_at, prompt_id, content, prompts:prompts(name)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(ACTIVITY_PAGE_SIZE + 1);
+
+  let followsQuery = supabase
+    .from("user_follows")
+    .select("created_at, following_id")
+    .eq("follower_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(ACTIVITY_PAGE_SIZE + 1);
+
+  if (cursor) {
+    likesQuery = likesQuery.lt("created_at", cursor);
+    commentsQuery = commentsQuery.lt("created_at", cursor);
+    followsQuery = followsQuery.lt("created_at", cursor);
+  }
+
+  const [{ data: likes }, { data: comments }, { data: follows }] = await Promise.all([
+    likesQuery,
+    commentsQuery,
+    followsQuery,
+  ]);
+
+  for (const l of likes ?? []) {
+    const name = (l as any).prompts?.name ?? "a prompt";
+    items.push({ type: "like", created_at: l.created_at, detail: `Liked "${name}"`, link: `/explore/${l.prompt_id}` });
+  }
+
+  for (const c of comments ?? []) {
+    const name = (c as any).prompts?.name ?? "a prompt";
+    items.push({ type: "comment", created_at: c.created_at, detail: `Commented on "${name}"`, link: `/explore/${c.prompt_id}` });
+  }
+
+  if (follows?.length) {
+    const followIds = follows.map((f) => f.following_id);
+    const { data: followProfiles } = await supabase
+      .from("profiles")
+      .select("user_id, display_name")
+      .in("user_id", followIds);
+    const profileMap = new Map((followProfiles ?? []).map((p) => [p.user_id, p.display_name]));
+    for (const f of follows) {
+      const name = profileMap.get(f.following_id) ?? "someone";
+      items.push({ type: "follow", created_at: f.created_at, detail: `Followed ${name}`, link: `/u/${f.following_id}` });
+    }
+  }
+
+  items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  const page = items.slice(0, ACTIVITY_PAGE_SIZE);
+  const nextCursor = items.length > ACTIVITY_PAGE_SIZE ? page[page.length - 1]?.created_at ?? null : null;
+  // Also check if any source returned a full page
+  const anySourceFull = (likes?.length ?? 0) > ACTIVITY_PAGE_SIZE || (comments?.length ?? 0) > ACTIVITY_PAGE_SIZE || (follows?.length ?? 0) > ACTIVITY_PAGE_SIZE;
+  return { items: page, nextCursor: page.length >= ACTIVITY_PAGE_SIZE && anySourceFull ? page[page.length - 1]?.created_at ?? null : nextCursor };
+}
+
 function useUserActivity(userId: string | undefined) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["user-activity", userId],
-    queryFn: async () => {
-      const items: ActivityItem[] = [];
-
-      // Recent likes
-      const { data: likes } = await supabase
-        .from("prompt_likes")
-        .select("created_at, prompt_id, prompts:prompts(name)")
-        .eq("user_id", userId!)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      for (const l of likes ?? []) {
-        const name = (l as any).prompts?.name ?? "a prompt";
-        items.push({ type: "like", created_at: l.created_at, detail: `Liked "${name}"`, link: `/explore/${l.prompt_id}` });
-      }
-
-      // Recent comments
-      const { data: comments } = await supabase
-        .from("prompt_comments")
-        .select("created_at, prompt_id, content, prompts:prompts(name)")
-        .eq("user_id", userId!)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      for (const c of comments ?? []) {
-        const name = (c as any).prompts?.name ?? "a prompt";
-        items.push({ type: "comment", created_at: c.created_at, detail: `Commented on "${name}"`, link: `/explore/${c.prompt_id}` });
-      }
-
-      // Recent follows
-      const { data: follows } = await supabase
-        .from("user_follows")
-        .select("created_at, following_id")
-        .eq("follower_id", userId!)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      if (follows?.length) {
-        const followIds = follows.map((f) => f.following_id);
-        const { data: followProfiles } = await supabase
-          .from("profiles")
-          .select("user_id, display_name")
-          .in("user_id", followIds);
-        const profileMap = new Map((followProfiles ?? []).map((p) => [p.user_id, p.display_name]));
-        for (const f of follows) {
-          const name = profileMap.get(f.following_id) ?? "someone";
-          items.push({ type: "follow", created_at: f.created_at, detail: `Followed ${name}`, link: `/u/${f.following_id}` });
-        }
-      }
-
-      items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      return items.slice(0, 30);
-    },
+    queryFn: ({ pageParam }) => fetchActivityPage(userId!, pageParam),
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: !!userId,
   });
 }
@@ -181,7 +204,20 @@ export default function UserProfile() {
   const { data: followingCount } = useFollowingCount(userId);
   const { data: isFollowing } = useIsFollowing(user?.id, userId);
   const { data: collections } = useUserCollections(userId);
-  const { data: activity, isLoading: activityLoading } = useUserActivity(userId);
+  const { data: activityData, isLoading: activityLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useUserActivity(userId);
+  const activity = activityData?.pages.flatMap((p) => p.items) ?? [];
+
+  // Infinite scroll observer
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!loadMoreRef.current || !hasNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) fetchNextPage(); },
+      { threshold: 0.5 }
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
 
   const followMutation = useMutation({
     mutationFn: async () => {
@@ -452,6 +488,16 @@ export default function UserProfile() {
                     </div>
                   </Link>
                 ))}
+                {/* Infinite scroll sentinel */}
+                <div ref={loadMoreRef} className="py-4 text-center">
+                  {isFetchingNextPage && (
+                    <div className="space-y-3">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <Skeleton key={i} className="h-12 rounded-md" />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </TabsContent>
