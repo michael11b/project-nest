@@ -116,7 +116,9 @@ export default function CollectionDetail() {
   const removeItem = useRemoveFromCollection();
   const reorderItems = useReorderCollectionItems();
   const deleteCollection = useDeleteCollection();
+  const updateCollection = useUpdateCollection();
   const [localItems, setLocalItems] = useState<any[] | null>(null);
+  const [viewCountIncremented, setViewCountIncremented] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
