@@ -9,7 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, FolderOpen, LogIn, Search, Sparkles, X } from "lucide-react";
+import { ArrowLeft, FolderOpen, LogIn, Plus, Search, Sparkles, X } from "lucide-react";
+import { CreateCollectionDialog } from "@/components/CreateCollectionDialog";
 
 type SortOption = "recent" | "oldest" | "alpha" | "alpha-desc";
 
@@ -19,6 +20,7 @@ export default function CollectionsList() {
   const allCollections = useMemo(() => data?.pages.flat() ?? [], [data]);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("recent");
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const collections = useMemo(() => {
@@ -60,6 +62,8 @@ export default function CollectionsList() {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
+    <>
+      <CreateCollectionDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
     <div className="min-h-screen bg-background">
       <div className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-primary/3 to-background border-b border-border/50">
         <div className="relative max-w-6xl mx-auto px-4 py-12">
@@ -70,11 +74,18 @@ export default function CollectionsList() {
               </Button>
               <h1 className="text-3xl font-bold tracking-tight">Collections</h1>
             </div>
-            {user ? (
-              <Link to="/"><Button variant="outline" size="sm">Dashboard</Button></Link>
-            ) : (
-              <Link to="/login"><Button size="sm"><LogIn className="h-4 w-4 mr-2" /> Sign In</Button></Link>
-            )}
+            <div className="flex items-center gap-2">
+              {user && (
+                <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" /> New Collection
+                </Button>
+              )}
+              {user ? (
+                <Link to="/"><Button variant="outline" size="sm">Dashboard</Button></Link>
+              ) : (
+                <Link to="/login"><Button size="sm"><LogIn className="h-4 w-4 mr-2" /> Sign In</Button></Link>
+              )}
+            </div>
           </div>
           <p className="text-muted-foreground max-w-lg">Curated sets of prompts shared by the community.</p>
         </div>
@@ -165,5 +176,6 @@ export default function CollectionsList() {
         )}
       </div>
     </div>
+    </>
   );
 }
