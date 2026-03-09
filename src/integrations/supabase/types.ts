@@ -746,6 +746,35 @@ export type Database = {
           },
         ]
       }
+      prompt_views: {
+        Row: {
+          id: string
+          prompt_id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          prompt_id: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          prompt_id?: string
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_views_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prompts: {
         Row: {
           comment_count: number
