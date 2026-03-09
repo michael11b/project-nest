@@ -105,10 +105,11 @@ export function EditProfileDialog({ open, onOpenChange, profile }: Props) {
     if (!user) return;
     setSaving(true);
 
-    const updates: Record<string, string | null> = {
+    const updates: Record<string, any> = {
       display_name: displayName.trim() || null,
       bio: bio.trim() || null,
       website: website.trim() || null,
+      notification_prefs: notifPrefs,
     };
 
     if (avatarUrl !== (profile.avatar_url ?? "")) {
