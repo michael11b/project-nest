@@ -21,10 +21,12 @@ import {
   GitFork,
   FolderOpen,
   Activity,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useUserCollections } from "@/hooks/useCollections";
 import { FollowListDialog } from "@/components/FollowListDialog";
+import { EditProfileDialog } from "@/components/EditProfileDialog";
 
 function useUserProfile(userId: string | undefined) {
   return useQuery({
@@ -170,6 +172,8 @@ export default function UserProfile() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [followDialogMode, setFollowDialogMode] = useState<"followers" | "following" | null>(null);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const isOwnProfile = user?.id === userId;
 
   const { data: profile, isLoading: profileLoading } = useUserProfile(userId);
   const { data: prompts, isLoading: promptsLoading } = useUserPublicPrompts(userId);
@@ -299,8 +303,12 @@ export default function UserProfile() {
             )}
           </div>
 
-          {/* Follow button */}
-          {user && user.id !== userId && (
+          {/* Follow / Edit button */}
+          {isOwnProfile ? (
+            <Button variant="outline" onClick={() => setEditProfileOpen(true)} className="min-w-[120px]">
+              <Pencil className="h-4 w-4 mr-1" /> Edit Profile
+            </Button>
+          ) : user && user.id !== userId ? (
             <Button
               variant={isFollowing ? "outline" : "default"}
               onClick={() => followMutation.mutate()}
@@ -313,13 +321,20 @@ export default function UserProfile() {
                 <><UserPlus className="h-4 w-4 mr-1" /> Follow</>
               )}
             </Button>
-          )}
-          {!user && (
+          ) : !user ? (
             <Button variant="outline" asChild>
               <Link to="/login">Sign in to follow</Link>
             </Button>
-          )}
+          ) : null}
         </div>
+
+        {isOwnProfile && profile && (
+          <EditProfileDialog
+            open={editProfileOpen}
+            onOpenChange={setEditProfileOpen}
+            profile={profile}
+          />
+        )}
 
         {/* Tabs */}
         <Tabs defaultValue="prompts" className="mt-2">
