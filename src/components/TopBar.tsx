@@ -77,6 +77,8 @@ export function TopBar() {
         </BreadcrumbList>
       </Breadcrumb>
 
+      <GlobalSearch />
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
