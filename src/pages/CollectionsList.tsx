@@ -62,6 +62,8 @@ export default function CollectionsList() {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
+    <>
+      <CreateCollectionDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
     <div className="min-h-screen bg-background">
       <div className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-primary/3 to-background border-b border-border/50">
         <div className="relative max-w-6xl mx-auto px-4 py-12">
