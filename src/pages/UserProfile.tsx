@@ -219,15 +219,23 @@ export default function UserProfile() {
                 <div className="text-lg font-semibold text-foreground">{prompts?.length ?? 0}</div>
                 <div className="text-xs text-muted-foreground">Prompts</div>
               </div>
-              <div className="text-center">
+              <button onClick={() => setFollowDialogMode("followers")} className="text-center hover:opacity-70 transition-opacity">
                 <div className="text-lg font-semibold text-foreground">{followerCount ?? 0}</div>
                 <div className="text-xs text-muted-foreground">Followers</div>
-              </div>
-              <div className="text-center">
+              </button>
+              <button onClick={() => setFollowDialogMode("following")} className="text-center hover:opacity-70 transition-opacity">
                 <div className="text-lg font-semibold text-foreground">{followingCount ?? 0}</div>
                 <div className="text-xs text-muted-foreground">Following</div>
-              </div>
+              </button>
             </div>
+            {userId && (
+              <FollowListDialog
+                userId={userId}
+                mode={followDialogMode ?? "followers"}
+                open={followDialogMode !== null}
+                onOpenChange={(open) => { if (!open) setFollowDialogMode(null); }}
+              />
+            )}
           </div>
 
           {/* Follow button */}
