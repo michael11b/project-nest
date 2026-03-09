@@ -1,5 +1,6 @@
 import { useLocation, Link } from "react-router-dom";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, Moon, Sun, Monitor } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { SidebarTrigger } from "@/components/ui/sidebar";
