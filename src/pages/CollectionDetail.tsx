@@ -224,6 +224,16 @@ export default function CollectionDetail() {
                   Drag cards to reorder
                 </p>
               )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast({ title: "Copied!", description: "Collection link copied to clipboard." });
+                }}
+              >
+                <Copy className="h-4 w-4 mr-1" /> Share
+              </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 ml-auto">
