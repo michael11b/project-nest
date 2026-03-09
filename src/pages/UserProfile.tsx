@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useUserCollections } from "@/hooks/useCollections";
+import { FollowListDialog } from "@/components/FollowListDialog";
 
 function useUserProfile(userId: string | undefined) {
   return useQuery({
