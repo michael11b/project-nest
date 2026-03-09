@@ -72,11 +72,18 @@ export default function CollectionsList() {
               </Button>
               <h1 className="text-3xl font-bold tracking-tight">Collections</h1>
             </div>
-            {user ? (
-              <Link to="/"><Button variant="outline" size="sm">Dashboard</Button></Link>
-            ) : (
-              <Link to="/login"><Button size="sm"><LogIn className="h-4 w-4 mr-2" /> Sign In</Button></Link>
-            )}
+            <div className="flex items-center gap-2">
+              {user && (
+                <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" /> New Collection
+                </Button>
+              )}
+              {user ? (
+                <Link to="/"><Button variant="outline" size="sm">Dashboard</Button></Link>
+              ) : (
+                <Link to="/login"><Button size="sm"><LogIn className="h-4 w-4 mr-2" /> Sign In</Button></Link>
+              )}
+            </div>
           </div>
           <p className="text-muted-foreground max-w-lg">Curated sets of prompts shared by the community.</p>
         </div>
