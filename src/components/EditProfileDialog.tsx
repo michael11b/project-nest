@@ -16,7 +16,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, Loader2, Bell } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 
 interface Props {
   open: boolean;
