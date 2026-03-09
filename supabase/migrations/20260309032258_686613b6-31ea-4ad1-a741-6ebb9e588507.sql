@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN notification_prefs jsonb NOT NULL DEFAULT '{"new_follower": true, "prompt_liked": true, "prompt_commented": true, "collection_updated": false}'::jsonb;

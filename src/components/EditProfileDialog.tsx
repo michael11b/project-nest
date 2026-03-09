@@ -16,7 +16,23 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, Loader2, Bell } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+
+interface NotificationPrefs {
+  new_follower: boolean;
+  prompt_liked: boolean;
+  prompt_commented: boolean;
+  collection_updated: boolean;
+}
+
+const defaultPrefs: NotificationPrefs = {
+  new_follower: true,
+  prompt_liked: true,
+  prompt_commented: true,
+  collection_updated: false,
+};
 
 interface Props {
   open: boolean;
@@ -27,6 +43,7 @@ interface Props {
     bio: string | null;
     website: string | null;
     avatar_url: string | null;
+    notification_prefs?: any;
   };
 }
 
@@ -42,6 +59,15 @@ export function EditProfileDialog({ open, onOpenChange, profile }: Props) {
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>(() => {
+    const raw = profile.notification_prefs;
+    if (raw && typeof raw === "object" && !Array.isArray(raw)) return { ...defaultPrefs, ...raw } as NotificationPrefs;
+    return { ...defaultPrefs };
+  });
+
+  const togglePref = (key: keyof NotificationPrefs) => {
+    setNotifPrefs((p) => ({ ...p, [key]: !p[key] }));
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -79,10 +105,11 @@ export function EditProfileDialog({ open, onOpenChange, profile }: Props) {
     if (!user) return;
     setSaving(true);
 
-    const updates: Record<string, string | null> = {
+    const updates: Record<string, any> = {
       display_name: displayName.trim() || null,
       bio: bio.trim() || null,
       website: website.trim() || null,
+      notification_prefs: notifPrefs,
     };
 
     if (avatarUrl !== (profile.avatar_url ?? "")) {
@@ -183,6 +210,35 @@ export function EditProfileDialog({ open, onOpenChange, profile }: Props) {
               placeholder="https://example.com"
               maxLength={200}
             />
+          </div>
+
+          <Separator />
+
+          {/* Email Notification Preferences */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Bell className="h-4 w-4 text-muted-foreground" />
+              <Label className="text-base font-medium">Email Notifications</Label>
+            </div>
+            <div className="space-y-3">
+              {([
+                { key: "new_follower" as const, label: "New follower", desc: "When someone follows you" },
+                { key: "prompt_liked" as const, label: "Prompt liked", desc: "When someone likes your prompt" },
+                { key: "prompt_commented" as const, label: "New comment", desc: "When someone comments on your prompt" },
+                { key: "collection_updated" as const, label: "Collection updates", desc: "Updates to collections you follow" },
+              ]).map((item) => (
+                <div key={item.key} className="flex items-center justify-between gap-4">
+                  <div className="space-y-0.5">
+                    <p className="text-sm font-medium text-foreground">{item.label}</p>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </div>
+                  <Switch
+                    checked={notifPrefs[item.key]}
+                    onCheckedChange={() => togglePref(item.key)}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
