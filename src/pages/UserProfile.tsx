@@ -26,6 +26,7 @@ import {
 import { toast } from "sonner";
 import { useUserCollections } from "@/hooks/useCollections";
 import { FollowListDialog } from "@/components/FollowListDialog";
+import { EditProfileDialog } from "@/components/EditProfileDialog";
 
 function useUserProfile(userId: string | undefined) {
   return useQuery({
