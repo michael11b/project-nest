@@ -35,13 +35,14 @@ export function CreateCollectionDialog({ open, onOpenChange }: Props) {
       {
         title: title.trim(),
         description: description.trim() || undefined,
-        visibility: "private",
+        visibility,
       },
       {
         onSuccess: () => {
           toast({ title: "Success", description: "Collection created!" });
           setTitle("");
           setDescription("");
+          setVisibility("private");
           onOpenChange(false);
         },
         onError: (error) => {
