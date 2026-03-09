@@ -211,6 +211,35 @@ export function EditProfileDialog({ open, onOpenChange, profile }: Props) {
               maxLength={200}
             />
           </div>
+
+          <Separator />
+
+          {/* Email Notification Preferences */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Bell className="h-4 w-4 text-muted-foreground" />
+              <Label className="text-base font-medium">Email Notifications</Label>
+            </div>
+            <div className="space-y-3">
+              {([
+                { key: "new_follower" as const, label: "New follower", desc: "When someone follows you" },
+                { key: "prompt_liked" as const, label: "Prompt liked", desc: "When someone likes your prompt" },
+                { key: "prompt_commented" as const, label: "New comment", desc: "When someone comments on your prompt" },
+                { key: "collection_updated" as const, label: "Collection updates", desc: "Updates to collections you follow" },
+              ]).map((item) => (
+                <div key={item.key} className="flex items-center justify-between gap-4">
+                  <div className="space-y-0.5">
+                    <p className="text-sm font-medium text-foreground">{item.label}</p>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </div>
+                  <Switch
+                    checked={notifPrefs[item.key]}
+                    onCheckedChange={() => togglePref(item.key)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         <DialogFooter>
