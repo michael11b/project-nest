@@ -27,6 +27,7 @@ export function TopBar() {
   const { profile, signOut } = useAuth();
   const { workspace } = useWorkspace();
   const location = useLocation();
+  const { theme, setTheme } = useTheme();
 
   // Build breadcrumb segments from the path after /w/:slug
   const segments = location.pathname
