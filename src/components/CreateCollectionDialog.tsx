@@ -24,6 +24,7 @@ interface Props {
 export function CreateCollectionDialog({ open, onOpenChange }: Props) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [visibility, setVisibility] = useState<"private" | "public" | "workspace">("private");
   const createCollection = useCreateCollection();
   const { toast } = useToast();
 
