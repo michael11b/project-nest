@@ -111,7 +111,7 @@ export function useCreateCollection() {
 export function useUpdateCollection() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...updates }: { id: string; title?: string; description?: string; visibility?: string; cover_image_url?: string }) => {
+    mutationFn: async ({ id, ...updates }: { id: string; title?: string; description?: string; visibility?: string; cover_image_url?: string; view_count?: number }) => {
       const { error } = await supabase.from("collections").update(updates).eq("id", id);
       if (error) throw error;
     },
