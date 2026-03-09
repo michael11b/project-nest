@@ -97,7 +97,17 @@ export default function VersionsList() {
                     onCheckedChange={() => toggleSelect(v.id)}
                   />
                 </TableCell>
-                <TableCell className="font-medium">v{v.version_number}</TableCell>
+                <TableCell className="font-medium flex items-center gap-1.5">
+                  v{v.version_number}
+                  {v.changelog?.startsWith("Reverted to v") && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Undo2 className="h-3.5 w-3.5 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="text-xs">{v.changelog}</TooltipContent>
+                    </Tooltip>
+                  )}
+                </TableCell>
                 <TableCell>
                   <Badge variant="secondary" className="text-xs capitalize">{v.status}</Badge>
                 </TableCell>
