@@ -106,6 +106,57 @@ function useIsFollowing(currentUserId: string | undefined, targetUserId: string 
   });
 }
 
+type ActivityItem = { type: "like" | "comment" | "follow"; created_at: string; detail: string; link?: string };
+
+function useUserActivity(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["user-activity", userId],
+    queryFn: async () => {
+      const items: ActivityItem[] = [];
+
+      // Recent likes
+      const { data: likes } = await supabase
+        .from("prompt_likes")
+        .select("created_at, prompt_id, prompts:prompts(name)")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      for (const l of likes ?? []) {
+        const name = (l as any).prompts?.name ?? "a prompt";
+        items.push({ type: "like", created_at: l.created_at, detail: `Liked "${name}"`, link: `/explore/${l.prompt_id}` });
+      }
+
+      // Recent comments
+      const { data: comments } = await supabase
+        .from("prompt_comments")
+        .select("created_at, prompt_id, content, prompts:prompts(name)")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      for (const c of comments ?? []) {
+        const name = (c as any).prompts?.name ?? "a prompt";
+        items.push({ type: "comment", created_at: c.created_at, detail: `Commented on "${name}"`, link: `/explore/${c.prompt_id}` });
+      }
+
+      // Recent follows
+      const { data: follows } = await supabase
+        .from("user_follows")
+        .select("created_at, following_id, profiles:profiles!user_follows_following_id_fkey(display_name)")
+        .eq("follower_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      for (const f of follows ?? []) {
+        const name = (f as any).profiles?.display_name ?? "someone";
+        items.push({ type: "follow", created_at: f.created_at, detail: `Followed ${name}`, link: `/u/${f.following_id}` });
+      }
+
+      items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      return items.slice(0, 30);
+    },
+    enabled: !!userId,
+  });
+}
+
 export default function UserProfile() {
   const { userId } = useParams<{ userId: string }>();
   const { user } = useAuth();
