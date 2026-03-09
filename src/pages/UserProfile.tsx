@@ -488,6 +488,16 @@ export default function UserProfile() {
                     </div>
                   </Link>
                 ))}
+                {/* Infinite scroll sentinel */}
+                <div ref={loadMoreRef} className="py-4 text-center">
+                  {isFetchingNextPage && (
+                    <div className="space-y-3">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <Skeleton key={i} className="h-12 rounded-md" />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </TabsContent>
