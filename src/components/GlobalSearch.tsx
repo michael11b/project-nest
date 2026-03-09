@@ -122,12 +122,6 @@ export function GlobalSearch() {
   const collections = results.filter((r) => r.type === "collection");
   const users = results.filter((r) => r.type === "user");
 
-  const iconMap = {
-    prompt: FileText,
-    collection: FolderOpen,
-    user: User,
-  };
-
   return (
     <>
       <button
