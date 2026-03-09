@@ -119,6 +119,8 @@ export default function CollectionDetail() {
   const updateCollection = useUpdateCollection();
   const [localItems, setLocalItems] = useState<any[] | null>(null);
   const [viewCountIncremented, setViewCountIncremented] = useState(false);
+  
+  const isOwner = user && collection && collection.user_id === user.id;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -137,7 +139,6 @@ export default function CollectionDetail() {
       });
     }
   }, [collection?.id, viewCountIncremented, isOwner, updateCollection]);
-  const isOwner = user?.id === collection?.user_id;
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
