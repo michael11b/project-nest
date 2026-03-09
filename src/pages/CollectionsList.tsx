@@ -7,13 +7,46 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, FolderOpen, LogIn, Sparkles } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft, FolderOpen, LogIn, Search, Sparkles, X } from "lucide-react";
+
+type SortOption = "recent" | "oldest" | "alpha" | "alpha-desc";
 
 export default function CollectionsList() {
   const { user } = useAuth();
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = usePublicCollections();
-  const collections = useMemo(() => data?.pages.flat() ?? [], [data]);
+  const allCollections = useMemo(() => data?.pages.flat() ?? [], [data]);
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<SortOption>("recent");
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  const collections = useMemo(() => {
+    let filtered = allCollections;
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      filtered = filtered.filter((c: any) =>
+        c.title?.toLowerCase().includes(q) ||
+        c.description?.toLowerCase().includes(q) ||
+        c.owner?.display_name?.toLowerCase().includes(q)
+      );
+    }
+    const sorted = [...filtered];
+    switch (sort) {
+      case "oldest":
+        sorted.sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        break;
+      case "alpha":
+        sorted.sort((a: any, b: any) => (a.title || "").localeCompare(b.title || ""));
+        break;
+      case "alpha-desc":
+        sorted.sort((a: any, b: any) => (b.title || "").localeCompare(a.title || ""));
+        break;
+      default: // recent — already sorted by updated_at desc from API
+        break;
+    }
+    return sorted;
+  }, [allCollections, search, sort]);
 
   useEffect(() => {
     const el = loadMoreRef.current;
