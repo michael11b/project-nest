@@ -20,6 +20,20 @@ import { Camera, Loader2, Bell } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 
+interface NotificationPrefs {
+  new_follower: boolean;
+  prompt_liked: boolean;
+  prompt_commented: boolean;
+  collection_updated: boolean;
+}
+
+const defaultPrefs: NotificationPrefs = {
+  new_follower: true,
+  prompt_liked: true,
+  prompt_commented: true,
+  collection_updated: false,
+};
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -29,6 +43,7 @@ interface Props {
     bio: string | null;
     website: string | null;
     avatar_url: string | null;
+    notification_prefs?: NotificationPrefs | null;
   };
 }
 
