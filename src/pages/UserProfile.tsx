@@ -172,6 +172,8 @@ export default function UserProfile() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [followDialogMode, setFollowDialogMode] = useState<"followers" | "following" | null>(null);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const isOwnProfile = user?.id === userId;
 
   const { data: profile, isLoading: profileLoading } = useUserProfile(userId);
   const { data: prompts, isLoading: promptsLoading } = useUserPublicPrompts(userId);
