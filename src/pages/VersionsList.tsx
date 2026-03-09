@@ -118,6 +118,7 @@ export default function VersionsList() {
           onOpenChange={setCompareOpen}
           versionA={compareVersions[0]}
           versionB={compareVersions[1]}
+          canEdit={canEdit}
         />
       )}
     </div>
