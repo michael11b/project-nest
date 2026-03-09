@@ -20,6 +20,7 @@ export default function CollectionsList() {
   const allCollections = useMemo(() => data?.pages.flat() ?? [], [data]);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("recent");
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const collections = useMemo(() => {
