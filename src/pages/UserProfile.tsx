@@ -320,6 +320,7 @@ export default function UserProfile() {
             <TabsTrigger value="collections">
               Collections ({collections?.filter((c: any) => c.visibility === "public").length ?? 0})
             </TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>
 
           <TabsContent value="prompts" className="mt-4">
