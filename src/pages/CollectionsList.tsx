@@ -9,7 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, FolderOpen, LogIn, Search, Sparkles, X } from "lucide-react";
+import { ArrowLeft, FolderOpen, LogIn, Plus, Search, Sparkles, X } from "lucide-react";
+import { CreateCollectionDialog } from "@/components/CreateCollectionDialog";
 
 type SortOption = "recent" | "oldest" | "alpha" | "alpha-desc";
 
