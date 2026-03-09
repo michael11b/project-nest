@@ -2,12 +2,13 @@ import { useState, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useCollectionDetail, useRemoveFromCollection, useReorderCollectionItems, useDeleteCollection } from "@/hooks/useCollections";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Heart, Eye, Sparkles, Trash2, Globe, Lock, GripVertical } from "lucide-react";
+import { ArrowLeft, Copy, Heart, Eye, Sparkles, Trash2, Globe, Lock, GripVertical } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -110,6 +111,7 @@ export default function CollectionDetail() {
   const { collectionId } = useParams<{ collectionId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
   const { data: collection, isLoading } = useCollectionDetail(collectionId);
   const removeItem = useRemoveFromCollection();
   const reorderItems = useReorderCollectionItems();
@@ -223,6 +225,16 @@ export default function CollectionDetail() {
                   Drag cards to reorder
                 </p>
               )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast({ title: "Copied!", description: "Collection link copied to clipboard." });
+                }}
+              >
+                <Copy className="h-4 w-4 mr-1" /> Share
+              </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 ml-auto">
