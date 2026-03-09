@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +23,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useUserCollections } from "@/hooks/useCollections";
+import { FollowListDialog } from "@/components/FollowListDialog";
 
 function useUserProfile(userId: string | undefined) {
   return useQuery({
@@ -107,6 +109,7 @@ export default function UserProfile() {
   const { userId } = useParams<{ userId: string }>();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [followDialogMode, setFollowDialogMode] = useState<"followers" | "following" | null>(null);
 
   const { data: profile, isLoading: profileLoading } = useUserProfile(userId);
   const { data: prompts, isLoading: promptsLoading } = useUserPublicPrompts(userId);
@@ -216,15 +219,23 @@ export default function UserProfile() {
                 <div className="text-lg font-semibold text-foreground">{prompts?.length ?? 0}</div>
                 <div className="text-xs text-muted-foreground">Prompts</div>
               </div>
-              <div className="text-center">
+              <button onClick={() => setFollowDialogMode("followers")} className="text-center hover:opacity-70 transition-opacity">
                 <div className="text-lg font-semibold text-foreground">{followerCount ?? 0}</div>
                 <div className="text-xs text-muted-foreground">Followers</div>
-              </div>
-              <div className="text-center">
+              </button>
+              <button onClick={() => setFollowDialogMode("following")} className="text-center hover:opacity-70 transition-opacity">
                 <div className="text-lg font-semibold text-foreground">{followingCount ?? 0}</div>
                 <div className="text-xs text-muted-foreground">Following</div>
-              </div>
+              </button>
             </div>
+            {userId && (
+              <FollowListDialog
+                userId={userId}
+                mode={followDialogMode ?? "followers"}
+                open={followDialogMode !== null}
+                onOpenChange={(open) => { if (!open) setFollowDialogMode(null); }}
+              />
+            )}
           </div>
 
           {/* Follow button */}
