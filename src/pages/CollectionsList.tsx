@@ -119,6 +119,9 @@ export default function CollectionsList() {
             </SelectContent>
           </Select>
         </div>
+        <div className="text-sm text-muted-foreground mb-4">
+          Showing {collections.length} collection{collections.length !== 1 ? "s" : ""} {hasNextPage && "(loading more...)"}
+        </div>
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-48 rounded-lg" />)}
