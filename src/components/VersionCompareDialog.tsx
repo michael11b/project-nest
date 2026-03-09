@@ -31,6 +31,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   versionA: PromptVersion;
   versionB: PromptVersion;
+  canEdit?: boolean;
 }
 
 type Message = { role: string; content: string };
