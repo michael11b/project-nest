@@ -204,6 +204,43 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
+
+        {/* Recently Viewed */}
+        <Card>
+          <CardHeader className="flex flex-row items-center gap-2 pb-2">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Recently Viewed</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentlyViewed?.length ? (
+              <ul className="space-y-2">
+                {recentlyViewed.map((v: any) => {
+                  const prompt = v.prompts;
+                  if (!prompt) return null;
+                  const wsSlug = prompt.workspaces?.slug;
+                  const link = wsSlug
+                    ? `/w/${wsSlug}/prompts/${prompt.id}`
+                    : `/explore/${prompt.id}`;
+                  return (
+                    <li key={v.prompt_id}>
+                      <Link
+                        to={link}
+                        className="flex items-center justify-between text-sm rounded-md px-2 py-1.5 -mx-2 hover:bg-accent transition-colors"
+                      >
+                        <span className="truncate font-medium">{prompt.name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(v.viewed_at).toLocaleDateString()}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">No recently viewed prompts</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
