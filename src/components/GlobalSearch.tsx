@@ -8,7 +8,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandLoading,
 } from "@/components/ui/command";
 import { FileText, FolderOpen, User, Search } from "lucide-react";
 import { useWorkspace } from "@/hooks/useWorkspace";
